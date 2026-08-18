@@ -1,0 +1,55 @@
+{
+  "schema_version": "v1",
+  "timestamp": "2026-02-21T18:50:58Z",
+  "result": "FAIL",
+  "gate_policy_hash": "sha256:0213631133afa80b1a5efb3684c51603786555d3d93164437b274033ccf515a8",
+  "gate_decision_hash": "sha256:f5b3a0f59f44022ccd265cdf141d6e94baf83420f50d70b1dc0f9d58f0f0f581",
+  "reasons": [
+    {
+      "code": "HASH_MISMATCH",
+      "message": "Computed content_hash does not match declared hash",
+      "severity": "ERROR",
+      "uri": "transfer_report.json",
+      "path": "$.artifacts[1]",
+      "context": {
+        "declared_hash": "sha256:a38e286fad9fc15fc299272999a4e72830a4838769368b7812df396088a8709c",
+        "computed_hash": "sha256:eefb21fdb05d2354ff6735059c4d2e982921abb9124f4d020c5e90ea75f1f32a",
+        "possible_causes": [
+          "File modified after artifact_index generation",
+          "Bit corruption during transfer"
+        ]
+      }
+    },
+    {
+      "code": "MISSING_REQUIRED_ARTIFACT",
+      "message": "Required artifact 'transfer_report' not found in artifact_index",
+      "severity": "ERROR",
+      "path": "$.artifacts",
+      "context": {
+        "artifact_type": "transfer_report",
+        "mode": "promote",
+        "explanation": "Policy requires 'transfer_report' for promote mode"
+      }
+    },
+    {
+      "code": "BINDING_INVALID",
+      "message": "Promotion requires plan_hash_a and plan_hash_b binding",
+      "severity": "ERROR",
+      "path": "$.transfer_report",
+      "context": {
+        "mode": "promote",
+        "has_plan_hash_a": false,
+        "has_plan_hash_b": false,
+        "has_run_ids": true,
+        "explanation": "run_ids binding is not sufficient for promotion"
+      }
+    }
+  ],
+  "artifact_refs": [
+    {
+      "artifact_type": "identity",
+      "uri": "identity.json",
+      "content_hash": "sha256:e4671fb8e7c88554c87a5e083e9d472d5d9c12ee1f4162fe71248873e69b0c56"
+    }
+  ]
+}

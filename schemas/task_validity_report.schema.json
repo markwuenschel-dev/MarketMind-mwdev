@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://marketmind.local/schemas/task_validity_report.schema.json",
+  "title": "MarketMind Task Validity Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["bundle_hash", "checks", "all_pass", "diagnostic_version", "timestamp"],
+  "properties": {
+    "bundle_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["check_id", "check_name", "passed", "evidence"],
+        "properties": {
+          "check_id": {
+            "type": "string",
+            "enum": ["TV-01", "TV-02", "TV-03"]
+          },
+          "check_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "passed": {
+            "type": "boolean"
+          },
+          "evidence": {
+            "type": "object",
+            "minProperties": 1,
+            "required": ["threshold_source"],
+            "additionalProperties": true,
+            "properties": {
+              "threshold_source": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "all_pass": {
+      "type": "boolean"
+    },
+    "diagnostic_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

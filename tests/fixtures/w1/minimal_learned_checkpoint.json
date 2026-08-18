@@ -1,0 +1,24 @@
+{
+  "checkpoint_content_hash": "sha256:2a9912f574404203cbf92202f3914c35a32d295e45c1a7008633850460128972",
+  "code_version": "fixture",
+  "created_at_utc": "2026-04-24T00:00:00Z",
+  "feature_encoder_contract_version": "w1_task_regime_one_hot_v1",
+  "model_state_hash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "schema_version": "marketmind.reptile_learned_checkpoint.v2",
+  "signal_set_version": "1",
+  "trainer_config_hash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+  "trained_by_runner": "w1_test_fixture.unprovenanced",
+  "training_data_fingerprint": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "training_run_id": "run.sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "training_splits_fingerprint": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "training_task_pool_hash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "weights": [
+    0.01,
+    0.02,
+    -0.01,
+    0.0,
+    0.0,
+    0.03,
+    0.01
+  ]
+}

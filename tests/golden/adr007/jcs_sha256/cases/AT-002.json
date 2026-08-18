@@ -1,0 +1,16 @@
+{
+  "case_id": "AT-002",
+  "canonicalization_surface": "jcs",
+  "payload": {
+    "z": {
+      "beta": false,
+      "alpha": true
+    },
+    "a": [
+      3,
+      2,
+      1
+    ]
+  },
+  "expected_digest_hex": "b317eb43cfc904a1143a08dd14c48e40578144382efbd6a3717583d62302cef0"
+}

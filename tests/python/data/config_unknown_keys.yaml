@@ -1,0 +1,6 @@
+logging:
+  leveel: INFO        # typo on purpose
+  format: json
+streaming:
+  buffer_size: 128
+  console: true

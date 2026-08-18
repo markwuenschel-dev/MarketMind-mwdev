@@ -1,0 +1,7 @@
+{
+  "schema_version": "1.0.0",
+  "python_version": "3.12.0",
+  "platform": "synthetic",
+  "git_sha": "fixture",
+  "deps": {}
+}

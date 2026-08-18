@@ -1,0 +1,9 @@
+{
+  "case_id": "AT-001",
+  "canonicalization_surface": "jcs",
+  "payload": {
+    "b": 2,
+    "a": 1
+  },
+  "expected_digest_hex": "43258cff783fe7036d8a43033f830adfc60ec037382473548ac742b888292777"
+}

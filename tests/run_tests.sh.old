@@ -1,0 +1,497 @@
+#!/usr/bin/env bash
+# Fast pytest launcher w/ coverage JSON + custom summary (tests excluded).
+# Defaults (override via env):
+#   TEST_PATH="tests"                 # test dir (also excluded from coverage tables/totals)
+#   PYTEST_ARGS=""                    # extra pytest args
+#   COV_TARGETS="."                   # comma-separated coverage targets
+#   COV_FAIL_UNDER=""                 # fail if total line % < this
+#   BR_FAIL_UNDER=""                  # fail if total branch % < this
+#   TOP_TABLE="5"                     # rows in top-miss tables
+#   JUNIT_XML=""                      # junit xml path (optional)
+#   MAX_FAIL="100"                     # default --maxfail
+#   LASTFAIL="1"                      # 1 to enable --last-failed workflow
+#   PLUGIN_AUTOLOAD="1"               # 0 disables 3rd-party plugin autoload (faster startup)
+#   DIST="load"                       # xdist strategy (try "worksteal" if available)
+#   WORKERS="auto"                    # xdist workers; e.g., 32 for fixed
+#   BYTECODE="1"                      # 1 sets PYTHONDONTWRITEBYTECODE=1
+#   TIMEOUT=""                        # per-test timeout in seconds (#1)
+#   SKIP_COVERAGE="0"                 # 1 to skip coverage collection (#4)
+#   DRY_RUN="0"                       # 1 to print command and exit (#5)
+#   VERBOSE="0"                       # 0=quiet, 1=normal, 2=very verbose (#7)
+#   MARKERS=""                        # pytest -m expression (#10)
+
+set -Eeuo pipefail
+IFS=$'\n\t'
+
+# Record wall clock start for duration reporting (#14)
+START_TIME=$(date +%s)
+
+# --- Defaults ---------------------------------------------------------------
+TEST_PATH="${TEST_PATH:-tests}"
+PYTEST_ARGS="${PYTEST_ARGS:-}"
+COV_TARGETS="${COV_TARGETS:-.}"
+COVERAGE_JSON="coverage.json"
+TOP_TABLE="${TOP_TABLE:-5}"
+MAX_FAIL="${MAX_FAIL:-35}"
+JUNIT_XML="${JUNIT_XML:-}"
+LASTFAIL="${LASTFAIL:-0}"
+PLUGIN_AUTOLOAD="${PLUGIN_AUTOLOAD:-1}"
+DIST="${DIST:-load}"
+WORKERS="${WORKERS:-auto}"
+BYTECODE="${BYTECODE:-1}"
+TIMEOUT="${TIMEOUT:-90}"              # #1
+SKIP_COVERAGE="${SKIP_COVERAGE:-0}" # #4
+DRY_RUN="${DRY_RUN:-0}"             # #5
+VERBOSE="${VERBOSE:-0}"             # #7
+MARKERS="${MARKERS:-}"              # #10
+
+# Less disk churn on large repos
+if [[ "${BYTECODE}" != "0" ]]; then
+  export PYTHONDONTWRITEBYTECODE=1
+fi
+
+PYTEST_BIN="${PYTEST_BIN:-pytest}"
+
+# ---------------------------------------------------------------------------
+# Smart core defaults for beefy machines (#15)
+# If WORKERS=="auto", try to pick N-2 workers and switch to worksteal on >=16 cores
+# ---------------------------------------------------------------------------
+if [[ "${WORKERS}" == "auto" ]]; then
+    CORES=$(python3 -c 'import os; print(os.cpu_count() or 1)' 2>/dev/null || echo 1)
+    if [[ "${CORES}" -ge 16 ]]; then
+        WORKERS=$((CORES-2))
+        DIST="worksteal"
+    fi
+fi
+
+# ---------------------------------------------------------------------------
+# Help / usage message (#12)
+# ---------------------------------------------------------------------------
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+    cat <<EOF
+Usage: $0 [additional pytest selectors/flags...]
+
+Environment variables:
+  WORKERS             num xdist workers (default: auto / core-aware)
+  DIST                xdist dist strategy (default: ${DIST})
+  PLUGIN_AUTOLOAD     1=on (default), 0=off (manual -p only)
+  TIMEOUT             per-test timeout in seconds
+  SKIP_COVERAGE       1 => skip coverage collection/summary
+  COV_FAIL_UNDER      fail if total line % < this
+  BR_FAIL_UNDER       fail if total branch % < this
+  VERBOSE             0=quiet, 1=normal, 2=very verbose
+  MARKERS             pytest -m expression, e.g. "not slow"
+  DRY_RUN             1 => print pytest command and exit
+  PYTEST_ARGS         extra raw pytest args (e.g. "-n auto --maxfail=1")
+  EXTRA_PLUGINS       comma-separated pytest plugins to -p load when autoload=0
+  TEST_PATH           which test dir to run (default: ${TEST_PATH})
+  BYTECODE            1=set PYTHONDONTWRITEBYTECODE (default: ${BYTECODE})
+  LASTFAIL            1=enable --last-failed workflow (default: ${LASTFAIL})
+  MAX_FAIL            --maxfail value (default: ${MAX_FAIL})
+  JUNIT_XML           junit xml output path
+  TOP_TABLE           rows in coverage top-miss tables (default: ${TOP_TABLE})
+EOF
+    exit 0
+fi
+
+# ---------------------------------------------------------------------------
+# Basic sanity: ensure pytest is available (#3)
+# ---------------------------------------------------------------------------
+if ! command -v "${PYTEST_BIN}" >/dev/null 2>&1; then
+    echo "Error: ${PYTEST_BIN} not found. Install pytest first."
+    exit 1
+fi
+
+# --- Plugin routing (faster startup) ----------------------------------------
+PYTEST_PLUGIN_OPTS=()
+if [[ "${PLUGIN_AUTOLOAD}" == "0" ]]; then
+  export PYTEST_DISABLE_PLUGIN_AUTOLOAD=1
+
+  # Always want coverage
+  PYTEST_PLUGIN_OPTS+=(-p pytest_cov)
+
+  # Add xdist if installed (#6 - improved detection)
+  if python3 -c 'import importlib.util,sys; sys.exit(0 if importlib.util.find_spec("xdist") and importlib.util.find_spec("xdist.plugin") else 1)' >/dev/null 2>&1; then
+    PYTEST_PLUGIN_OPTS+=(-p xdist.plugin)
+  fi
+
+  # Add pytest-timeout if installed (needed for --timeout in addopts)
+  if python3 -c 'import importlib.util,sys; sys.exit(0 if importlib.util.find_spec("pytest_timeout") else 1)' >/dev/null 2>&1; then
+    PYTEST_PLUGIN_OPTS+=(-p pytest_timeout)
+  fi
+
+  # Optional: extra plugin modules, comma-separated (e.g., "pytest_randomly,pytest_rerunfailures")
+  if [[ -n "${EXTRA_PLUGINS:-}" ]]; then
+    IFS=',' read -r -a _mods <<< "${EXTRA_PLUGINS}"
+    for m in "${_mods[@]}"; do PYTEST_PLUGIN_OPTS+=(-p "$m"); done
+  fi
+fi
+
+# --- Coverage args (JSON only; no built-in table) ---------------------------
+COV_FLAGS=()
+if [[ "${SKIP_COVERAGE}" == "0" ]]; then
+  
+  COV_FLAGS=(
+  --cov-branch
+  --cov-report "json:${COVERAGE_JSON}"
+  --cov-report "html"
+  --cov-report "xml"
+)
+
+IFS=',' read -r -a _targets <<< "${COV_TARGETS}"
+for t in "${_targets[@]}"; do
+    COV_FLAGS+=(--cov="$t")
+done
+
+[[ -n "${JUNIT_XML}" ]] && COV_FLAGS+=(--junitxml "${JUNIT_XML}")
+
+fi
+
+# Fail budget
+if [[ -n "${MAX_FAIL}" ]]; then
+  if [[ "${MAX_FAIL}" =~ ^[0-9]+$ && "${MAX_FAIL}" -gt 0 ]]; then
+    COV_FLAGS+=("--maxfail=${MAX_FAIL}")
+  else
+    case "${MAX_FAIL,,}" in 1|y|yes|true) COV_FLAGS+=(-x) ;; esac
+  fi
+fi
+
+# Base flags: verbose + compact tracebacks (#7 - verbosity control)
+PYTEST_BASE_OPTS=()
+case "${VERBOSE}" in
+  0) PYTEST_BASE_OPTS+=(--quiet --tb=short -rf) ;;
+  1) PYTEST_BASE_OPTS+=(-v --tb=short) ;;
+  2) PYTEST_BASE_OPTS+=(-vv --tb=long) ;;
+  *) PYTEST_BASE_OPTS+=(-v --tb=short) ;;
+esac
+
+# Last-failed workflow (fast feedback)
+if [[ "${LASTFAIL}" != "0" ]]; then
+  PYTEST_BASE_OPTS+=(--last-failed --last-failed-no-failures=all)
+fi
+
+# Per-test timeout if requested (#1)
+[[ -n "${TIMEOUT}" ]] && PYTEST_BASE_OPTS+=(--timeout="${TIMEOUT}")
+
+# Marker filtering (#10)
+[[ -n "${MARKERS}" ]] && PYTEST_BASE_OPTS+=(-m "${MARKERS}")
+
+# Parallel if xdist is available (works whether autoload is on or off)
+# Detect xdist support more robustly (#6)
+HAVE_XDIST=0
+if python3 -c 'import importlib.util,sys; sys.exit(0 if importlib.util.find_spec("xdist") else 1)' >/dev/null 2>&1; then
+  HAVE_XDIST=1
+fi
+
+PYTEST_SPEED_OPTS=()
+if [[ "${HAVE_XDIST}" -eq 1 ]]; then
+  PYTEST_SPEED_OPTS+=(-n "${WORKERS}" --dist="${DIST}")
+fi
+
+# --- Clean caches & prior coverage artifacts --------------------------------
+CLEAN="${CLEAN:-1}"        # set CLEAN=0 to skip cleaning
+DEEP_CLEAN="${DEEP_CLEAN:-1}"  # set 0 to only clean under TEST_PATH+COV_TARGETS
+
+if [[ "${CLEAN}" != "0" ]]; then
+  echo "==> Cleaning caches"
+  # coverage artifacts
+  rm -f .coverage "${COVERAGE_JSON}" || true
+  # top-level pytest cache
+  rm -rf .pytest_cache || true
+
+  # build target list: TEST_PATH + all COV_TARGETS
+  _paths=()
+  [[ -n "${TEST_PATH}" ]] && _paths+=("${TEST_PATH}")
+  IFS=',' read -r -a _covs <<< "${COV_TARGETS}"
+  for p in "${_covs[@]}"; do [[ -n "$p" ]] && _paths+=("$p"); done
+
+  # de-dupe targets
+  declare -A _seen=()
+  _uniq_paths=()
+  for p in "${_paths[@]}"; do
+    [[ -z "$p" ]] && continue
+    [[ -n "${_seen[$p]:-}" ]] && continue
+    _seen[$p]=1; _uniq_paths+=("$p")
+  done
+
+  # always clean under TEST_PATH and COV_TARGETS
+  for base in "${_uniq_paths[@]}"; do
+    [[ -d "$base" ]] || continue
+    find "$base" -type d -name '__pycache__' -prune -exec rm -rf {} + 2>/dev/null || true
+    find "$base" -type d -name '.pytest_cache' -prune -exec rm -rf {} + 2>/dev/null || true
+  done
+
+  # optionally deep-clean repo-wide caches (default on)
+  if [[ "${DEEP_CLEAN}" != "0" ]]; then
+    # repo root caches (safe, fast)
+    rm -rf .mypy_cache .ruff_cache .hypothesis .pytest_cache || true
+    # if you want absolute thoroughness, also scan the repo for stray caches:
+    # (kept fast by pruning .git and node_modules)
+    find . -path ./.git -prune -o -path ./node_modules -prune -o \
+      -type d \( -name '__pycache__' -o -name '.pytest_cache' \) -exec rm -rf {} + 2>/dev/null || true
+  fi
+fi
+
+echo "==> Running tests (xdist: $([[ ${HAVE_XDIST} -eq 1 ]] && echo on || echo off); dist=${DIST}; lastfail: $([[ "${LASTFAIL}" != 0 ]] && echo on || echo off); autoload: $([[ "${PLUGIN_AUTOLOAD}" == 0 ]] && echo off || echo on))"
+
+# Split PYTEST_ARGS into an array using regular shell word-splitting semantics.
+# This fixes the '-n auto' issue when IFS doesn't include space. (critical fix)
+# shellcheck disable=SC2206
+PYTEST_ARGS_ARR=(${PYTEST_ARGS})
+
+# If DRY_RUN=1, just show the command and exit 0 (#5)
+if [[ "${DRY_RUN}" != "0" ]]; then
+    echo "DRY RUN => ${PYTEST_BIN} ${PYTEST_PLUGIN_OPTS[*]:-} ${PYTEST_BASE_OPTS[*]:-} ${PYTEST_SPEED_OPTS[*]:-} ${TEST_PATH} ${COV_FLAGS[*]:-} ${PYTEST_ARGS_ARR[*]:-}"
+    exit 0
+fi
+
+set +e
+${PYTEST_BIN} "${PYTEST_PLUGIN_OPTS[@]}" "${PYTEST_BASE_OPTS[@]}" "${PYTEST_SPEED_OPTS[@]}" "${TEST_PATH}" "${COV_FLAGS[@]}" "${PYTEST_ARGS_ARR[@]}"
+PYTEST_STATUS=$?
+set -e
+
+# Clean up temp coverage config if it exists
+[[ -n "${TEMP_COV_RC:-}" && -f "${TEMP_COV_RC}" ]] && rm -f "${TEMP_COV_RC}"
+
+# --- Custom coverage summary & gates (tests excluded) -----------------------
+# Only run summary if we actually collected coverage (#4) and coverage.json exists
+if [[ "${SKIP_COVERAGE}" == "0" && -f "${COVERAGE_JSON}" ]]; then
+echo "==> Computing coverage summary (excluding files under: ${TEST_PATH})"
+set +e
+
+if ! command -v jq >/dev/null 2>&1; then
+  echo "jq is required for shell-only coverage summary. Install jq or use --cov-report=term-missing."
+  # don't exit non-zero here; just skip fancy summary
+else
+
+# Minimal colors for PASS/FAIL (#9)
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+TOP_TABLE="${TOP_TABLE:-10}"
+TEST_PATH="${TEST_PATH:-tests}"
+COV_FAIL_UNDER="${COV_FAIL_UNDER:-}"
+BR_FAIL_UNDER="${BR_FAIL_UNDER:-}"
+
+# jq program to compute per-file stats and totals, plus pretty ranges
+read -r -d '' JQ_PROG <<'JQ'
+def nz: . // 0;
+def lines_to_ranges:
+  (sort | unique) as $xs
+  | if ($xs|length)==0 then "" else
+      reduce $xs[] as $n
+        ({start:null, prev:null, out:[]};
+         if .start==null then {start:$n, prev:$n, out:.out}
+         elif $n == (.prev + 1) then .prev = $n
+         else .out += [[.start,.prev]] | {start:$n, prev:$n, out:.out}
+         end)
+      | (.out + (if .start==null then [] else [[.start,.prev]] end))
+      | map(if .[0]==.[1] then "\(. [0])" else "\(. [0])-\(. [1])" end)
+      | join(", ")
+    end;
+
+def missing_branch_map:
+  ((.branches.missing // .missing_branches // [])
+   | map(select(type=="array" and length>=1))) as $m
+  | reduce $m[] as $it
+      ({}; .[(($it[0]|tonumber))|tostring] += [
+            ( if ($it|length>1)
+              then ( ($it[1]|tostring) )
+              else null
+              end )
+          ]);
+
+. as $root
+| ($TEST_DIR) as $t
+| [$root.files
+   | to_entries[]
+   | select( (.key|gsub("\\\\";"/")) as $p
+             | ($p|startswith($t+"/") or $p==$t) | not)
+   | { name: .key,
+       summary: (.value.summary // {}),
+       meta: .value
+     }
+  ] as $files
+
+| [$files[]
+   | { name,
+       stmts:   (.summary.num_statements|nz),
+       miss:    (.summary.missing_lines|nz),
+       branch:  (.summary.num_branches|nz),
+       brmiss:  (.summary.missing_branches|nz),
+       missing_lines: (.meta.missing_lines // []),
+       missing_br_map: (.meta | missing_branch_map)
+     }
+  ] as $rows
+
+| ( $rows | reduce .[] as $r
+      ({stmts:0,covl:0,missl:0, br:0,covb:0,missb:0};
+       .stmts+=($r.stmts)
+       | .missl+=($r.miss)
+       | .covl += ($r.stmts - $r.miss)
+       | .br   += ($r.branch)
+       | .missb+= ($r.brmiss)
+       | .covb += ($r.branch - $r.brmiss)
+      )) as $tot
+
+| {
+    totals: {
+      stmts: $tot.stmts, cov_lines: $tot.covl, miss_lines: $tot.missl,
+      branches: $tot.br, cov_branches: $tot.covb, miss_branches: $tot.missb,
+      line_pct: (if $tot.stmts>0 then (100 * ($tot.covl / $tot.stmts)) else null end),
+      branch_pct: (if $tot.br>0 then (100 * ($tot.covb / $tot.br)) else null end)
+    },
+    by_br: ( $rows | sort_by(.brmiss, .miss) | reverse ),
+    by_lines: ( $rows | sort_by(.miss, .brmiss) | reverse ),
+    details: {
+      lines: ( $rows
+               | map({name:.name,
+                      str: ("missing lines: " +
+                            ((.missing_lines|map(tonumber))|lines_to_ranges)
+                           )
+                     })
+             ),
+      branches: ( $rows
+        | map({
+            name:.name,
+            str: (
+              "missing branches: " +
+              ( .missing_br_map
+                | to_entries
+                | sort_by(.key|tonumber)
+                | map(
+                    "L" + .key + ": [" +
+                    ( .value
+                      | map( if .==null or .=="-1" then "else" else tostring end )
+                      | join(", ")
+                    )
+                    + "]"
+                  )
+                | join("; ")
+              )
+            )
+          })
+      )
+    }
+  }
+JQ
+
+# Run jq with TEST_DIR exclusion
+JSON=$(jq --arg TEST_DIR "$(printf '%s' "$TEST_PATH" | sed 's#\\#/#g; s#^\.\/##')" "$JQ_PROG" coverage.json) || exit 0
+
+tot_stmts=$(jq -r '.totals.stmts' <<<"$JSON")
+tot_covl=$(jq -r '.totals.cov_lines' <<<"$JSON")
+tot_missl=$(jq -r '.totals.miss_lines' <<<"$JSON")
+tot_br=$(jq -r '.totals.branches' <<<"$JSON")
+tot_covb=$(jq -r '.totals.cov_branches' <<<"$JSON")
+tot_missb=$(jq -r '.totals.miss_branches' <<<"$JSON")
+line_pct=$(jq -r '.totals.line_pct // "null"' <<<"$JSON")
+br_pct=$(jq -r '.totals.branch_pct // "null"' <<<"$JSON")
+
+fmt_pct() { awk -v x="$1" 'BEGIN{ if(x=="null"){print "n/a"} else {printf "%.2f", x} }'; }
+
+echo "==> TOTALS (lines & branches) [tests excluded]"
+printf "%-16s: %s/%s  missed=%s  (%s%%)\n" \
+  "Total Stmts" "$tot_covl" "$tot_stmts" "$tot_missl" "$(fmt_pct "$line_pct")"
+printf "%-16s: %s/%s  missed=%s  (%s%%)\n" \
+  "Total Branches" "$tot_covb" "$tot_br" "$tot_missb" "$(fmt_pct "$br_pct")"
+
+pad() { printf "%-60.60s" "$1"; }
+
+# ----------------------------
+# Summary table: Missing BRANCHES (no deep dive inline)
+# ----------------------------
+echo "==> Top 10 files by MISSING BRANCHES"
+printf "%-60s %6s %6s %6s %7s %7s %7s\n" \
+  "Name" "Stmts" "Miss" "Branch" "BrMiss" "Line%" "Br%"
+
+jq -c ".by_br[:10][]" <<<"$JSON" | while IFS= read -r row; do
+  name=$(jq -r '.name' <<<"$row")
+  stmts=$(jq -r '.stmts' <<<"$row")
+  miss=$(jq -r '.miss' <<<"$row")
+  branch=$(jq -r '.branch' <<<"$row")
+  brmiss=$(jq -r '.brmiss' <<<"$row")
+
+  lp=$(awk -v s="$stmts" -v m="$miss" \
+        'BEGIN{if(s==0)print "n/a"; else printf "%.2f", 100*(s-m)/s}')
+  bp=$(awk -v b="$branch" -v bm="$brmiss" \
+        'BEGIN{if(b==0)print "n/a"; else printf "%.2f", 100*(b-bm)/b}')
+
+  pad "$name"
+  printf " %6s %6s %6s %7s %7s %7s\n" \
+    "$stmts" "$miss" "$branch" "$brmiss" "$lp" "$bp"
+done
+echo
+
+# ----------------------------
+# Summary table: Missing LINES (no deep dive inline)
+# ----------------------------
+echo "==> Top 10 files by MISSING LINES"
+printf "%-60s %6s %6s %6s %7s %7s %7s\n" \
+  "Name" "Stmts" "Miss" "Branch" "BrMiss" "Line%" "Br%"
+
+jq -c ".by_lines[:10][]" <<<"$JSON" | while IFS= read -r row; do
+  name=$(jq -r '.name' <<<"$row")
+  stmts=$(jq -r '.stmts' <<<"$row")
+  miss=$(jq -r '.miss' <<<"$row")
+  branch=$(jq -r '.branch' <<<"$row")
+  brmiss=$(jq -r '.brmiss' <<<"$row")
+
+  lp=$(awk -v s="$stmts" -v m="$miss" \
+        'BEGIN{if(s==0)print "n/a"; else printf "%.2f", 100*(s-m)/s}')
+  bp=$(awk -v b="$branch" -v bm="$brmiss" \
+        'BEGIN{if(b==0)print "n/a"; else printf "%.2f", 100*(b-bm)/b}')
+
+  pad "$name"
+  printf " %6s %6s %6s %7s %7s %7s\n" \
+    "$stmts" "$miss" "$branch" "$brmiss" "$lp" "$bp"
+done
+echo
+
+# ----------------------------
+# Deep dive for branch misses (top N)
+# ----------------------------
+echo "==> Top ${TOP_TABLE} files by MISSING BRANCHES (deep dive)"
+jq -c ".by_br[:$TOP_TABLE][]" <<<"$JSON" | while IFS= read -r row; do
+  name=$(jq -r '.name' <<<"$row")
+  det=$(jq -r --arg n "$name" \
+        '.details.branches[] | select(.name==$n) | .str' <<<"$JSON")
+
+  if [[ -n "$det" && "$det" != "missing branches: " ]]; then
+    echo "$name"
+    printf "    %s\n\n" "$det"
+  fi
+done
+
+# ---- Gates (optional) w/ PASS/FAIL coloring ----
+gate_ok=1
+if [[ -n "$COV_FAIL_UNDER" && "$line_pct" != "null" ]]; then
+  pass_fail=$(awk -v a="$line_pct" -v b="$COV_FAIL_UNDER" \
+    'BEGIN{exit (a+1e-9>=b)?0:1}' \
+    && echo -e "${GREEN}PASS${NC}" || echo -e "${RED}FAIL${NC}")
+  printf "GATE (lines): %.2f%% >= %.2f%% ? %s\n" \
+    "$line_pct" "$COV_FAIL_UNDER" "$pass_fail"
+  awk -v a="$line_pct" -v b="$COV_FAIL_UNDER" \
+    'BEGIN{exit (a+1e-9>=b)?0:2}'; (( gate_ok&=!$? ))
+fi
+if [[ -n "$BR_FAIL_UNDER" && "$br_pct" != "null" ]]; then
+  pass_fail=$(awk -v a="$br_pct" -v b="$BR_FAIL_UNDER" \
+    'BEGIN{exit (a+1e-9>=b)?0:1}' \
+    && echo -e "${GREEN}PASS${NC}" || echo -e "${RED}FAIL${NC}")
+  printf "GATE (branches): %.2f%% >= %.2f%% ? %s\n" \
+    "$br_pct" "$BR_FAIL_UNDER" "$pass_fail"
+  awk -v a="$br_pct" -v b="$BR_FAIL_UNDER" \
+    'BEGIN{exit (a+1e-9>=b)?0:2}'; (( gate_ok&=!$? ))
+fi
+if [[ -n "$COV_FAIL_UNDER$BR_FAIL_UNDER" ]]; then
+  if [[ $gate_ok -eq 1 ]]; then
+    echo -e "RESULT: ${GREEN}PASS${NC}"
+  else
+    echo -e "RESULT: ${RED}FAIL${NC}"
+  fi
+  [[ $gate_ok -eq 1 ]] || exit 2
+fi
+
+fi  # jq present
+fi  # SKIP_COVERAGE==0 && coverage.json

@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://marketmind.ai/schemas/screening_report.schema.json",
+  "title": "Screening Report",
+  "description": "Phase I-E screening report: candidates (accepts and rejects) with stage outcomes.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0.0" },
+    "screening_run_id": { "type": "string", "minLength": 1, "pattern": "^[a-f0-9]{64}$" },
+    "pit_boundary": { "type": "string", "format": "date-time" },
+    "data_snapshot_hash": { "type": "string" },
+    "seed": { "type": "integer" },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "candidate_run_id": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "spec_hash": { "type": "string" },
+          "signal_name": { "type": "string" },
+          "slot_index": { "type": ["integer", "null"] },
+          "stages": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "stage": { "type": "string", "enum": ["INTAKE", "LANE_0", "LANE_1", "LANE_2", "PROMOTION"] },
+                "status": { "type": "string", "enum": ["ACCEPTED", "REJECTED", "ERROR", "SKIPPED"] },
+                "reason_code": { "type": ["string", "null"] },
+                "reason_family": { "type": ["string", "null"] },
+                "reason_detail": { "type": ["string", "null"] },
+                "metrics": { "type": "object" },
+                "duration_ms": { "type": "integer" },
+                "timestamp": { "type": "string", "format": "date-time" }
+              },
+              "required": ["stage", "status", "timestamp"]
+            }
+          },
+          "final_status": { "type": "string", "enum": ["PROMOTED", "REJECTED", "ERROR"] },
+          "final_stage": { "type": "string" },
+          "final_reason_code": { "type": ["string", "null"] }
+        },
+        "required": ["candidate_run_id", "spec_hash", "signal_name", "stages", "final_status", "final_stage"]
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "total_candidates": { "type": "integer" },
+        "intake_rejected": { "type": "integer" },
+        "lane_0_rejected": { "type": "integer" },
+        "lane_1_rejected": { "type": "integer" },
+        "lane_2_rejected": { "type": "integer" },
+        "promotion_rejected": { "type": "integer" },
+        "promoted": { "type": "integer" },
+        "errors": { "type": "integer" },
+        "rejection_distribution": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "reason_code": { "type": "string" },
+              "count": { "type": "integer" }
+            },
+            "required": ["reason_code", "count"]
+          }
+        }
+      },
+      "required": ["total_candidates", "intake_rejected", "lane_0_rejected", "lane_1_rejected", "lane_2_rejected", "promotion_rejected", "promoted", "errors", "rejection_distribution"]
+    }
+  },
+  "required": ["schema_version", "screening_run_id", "pit_boundary", "data_snapshot_hash", "seed", "candidates", "summary"]
+}

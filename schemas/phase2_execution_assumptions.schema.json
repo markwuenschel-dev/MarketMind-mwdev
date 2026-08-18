@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://marketmind.local/schemas/phase2_execution_assumptions.schema.json",
+  "title": "MarketMind Phase II Execution Assumptions",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_version",
+    "run_id",
+    "timestamp",
+    "non_promotable",
+    "phase",
+    "promotable_claim_emitted",
+    "governed_artifact_contract",
+    "run_identity",
+    "seed_lineage",
+    "content_hash",
+    "cost_model",
+    "slippage_model",
+    "borrow_funding",
+    "latency_fill",
+    "shared_comparison_context"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "pattern": "^execution_assumptions\\.scaffold\\." },
+    "artifact_version": { "type": "string", "const": "mln06.phase2.contract.v1" },
+    "run_id": { "type": "string", "pattern": "^run\\.sha256:[0-9a-f]{64}$" },
+    "timestamp": { "type": "string", "minLength": 1 },
+    "non_promotable": { "type": "boolean", "const": true },
+    "phase": { "type": "string", "const": "II-0B" },
+    "promotable_claim_emitted": { "type": "boolean", "const": false },
+    "governed_artifact_contract": { "type": "boolean", "const": true },
+    "run_identity": { "$ref": "#/$defs/run_identity" },
+    "seed_lineage": { "$ref": "#/$defs/seed_lineage" },
+    "content_hash": { "$ref": "#/$defs/content_hash" },
+    "cost_model": { "type": "object", "minProperties": 1, "additionalProperties": true },
+    "slippage_model": { "type": "object", "minProperties": 1, "additionalProperties": true },
+    "borrow_funding": { "type": "object", "minProperties": 1, "additionalProperties": true },
+    "latency_fill": { "type": "object", "minProperties": 1, "additionalProperties": true },
+    "shared_comparison_context": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["splits_fingerprint", "data_fingerprint", "cost_assumptions_fingerprint"],
+      "properties": {
+        "splits_fingerprint": { "type": "string", "minLength": 1 },
+        "data_fingerprint": { "type": "string", "minLength": 1 },
+        "cost_assumptions_fingerprint": { "type": "string", "minLength": 1 }
+      }
+    }
+  },
+  "$defs": {
+    "content_hash": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "canonicalization", "value"],
+      "properties": {
+        "algorithm": { "type": "string", "const": "sha256" },
+        "canonicalization": {
+          "type": "string",
+          "const": "json.sort_keys.no_ws.omit_content_hash.v1"
+        },
+        "value": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    },
+    "run_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "seed", "run_id", "non_promotable"],
+      "properties": {
+        "schema_version": { "type": "string", "const": "phase2_scaffold.run_identity.v1" },
+        "seed": { "type": "integer", "minimum": 0 },
+        "run_id": { "type": "string", "pattern": "^run\\.sha256:[0-9a-f]{64}$" },
+        "non_promotable": { "type": "boolean", "const": true }
+      }
+    },
+    "seed_lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "run_seed_root", "derived_seeds"],
+      "properties": {
+        "schema_version": { "type": "string", "const": "phase2.seed_lineage.v1" },
+        "run_seed_root": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "derived_seeds": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/derived_seed" }
+        }
+      }
+    },
+    "derived_seed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["namespace", "context_string_sha256", "derived_seed_hex", "uint64_seed"],
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "enum": [
+            "task_sampling",
+            "task_window_selection",
+            "replay_curriculum_sampling",
+            "checkpoint_reference_eval"
+          ]
+        },
+        "context_string_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "derived_seed_hex": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "uint64_seed": { "type": "integer", "minimum": 0, "maximum": 18446744073709551615 }
+      }
+    }
+  }
+}

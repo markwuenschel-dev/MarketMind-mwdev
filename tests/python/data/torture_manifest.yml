@@ -1,0 +1,3 @@
+crossfile_prices.csv:
+  sidecar: crossfile_metadata.csv
+  expect: crossfile_consistency

@@ -1,0 +1,17 @@
+{
+  "suite": "minhash",
+  "version": "1.1.0",
+  "primitive": "minhash",
+  "adr": "ADR-007 v1.1",
+  "determinism_tier": "d2",
+  "languages_required": ["python-3.12", "cpp-20", "java-21"],
+  "ci_harness_gap": "The sparse-set golden-vector location is reserved, but no cross-language MinHash certification harness has been added yet.",
+  "cases": [
+    {
+      "id": "MH-001",
+      "path": "cases/MH-001.json",
+      "kind": "json-metadata",
+      "description": "Seed-derivation anchor for MinHash SipHash key schedule."
+    }
+  ]
+}

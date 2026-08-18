@@ -1,0 +1,7 @@
+{
+  "case_id": "SH-001",
+  "dim": 4,
+  "master_seed_hex": "0000000000000000000000000000000000000000000000000000000000000000",
+  "bit_index": 0,
+  "expected_projection_seed_hex": "481d9e0df26f4d296209e52134dae929f09253aff4a7ee44b7bab9b1a9116aa0"
+}

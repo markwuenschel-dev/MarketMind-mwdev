@@ -1,0 +1,5 @@
+streaming:
+  buffer_size: ${MARKETMIND__STREAMING__BUFFER_SIZE}
+  console: ${MARKETMIND__STREAMING__CONSOLE}
+profiles:
+  - ${MARKETMIND__PROFILES}

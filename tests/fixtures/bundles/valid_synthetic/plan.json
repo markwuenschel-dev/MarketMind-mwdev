@@ -1,0 +1,9 @@
+{
+  "schema_version": "1.0.0",
+  "plan_hash": "sha256:validsyntheticplan",
+  "as_of_time": "2026-04-10T12:00:00Z",
+  "config_hash": "sha256:validsyntheticconfig",
+  "config": {
+    "diagnostic_fixture": "valid_synthetic"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "schema_version": "v1",
+  "artifacts": [
+    {
+      "artifact_type": "identity",
+      "uri": "identity.json",
+      "content_hash": "sha256:e4671fb8e7c88554c87a5e083e9d472d5d9c12ee1f4162fe71248873e69b0c56",
+      "schema_version": "v1"
+    }
+  ]
+}

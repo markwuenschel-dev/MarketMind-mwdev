@@ -1,0 +1,27 @@
+{
+  "suite": "blake3",
+  "version": "1.1.0",
+  "primitive": "blake3",
+  "adr": "ADR-007 v1.1",
+  "determinism_tier": "d2",
+  "languages_required": ["python-3.12", "cpp-20", "java-21"],
+  "ci_harness_gap": "Golden-vector files are present, but the cross-language certification harness is not wired in this repo yet.",
+  "cases": [
+    {
+      "id": "BL-001",
+      "path": "cases/BL-001.bin",
+      "kind": "input-bytes",
+      "replay_mode": "python-fallback",
+      "expected_digest_hex": "02507f19d31fd3d72325132c7b1b5c793a526b07ed189958efc82645ea8150ac",
+      "description": "Empty-payload anchor placeholder for the official BLAKE3 empty input vector."
+    },
+    {
+      "id": "BL-002",
+      "path": "cases/BL-002.bin",
+      "kind": "input-bytes",
+      "replay_mode": "python-fallback",
+      "expected_digest_hex": "5192a5d283fe70024c22679300af8984dc070090597732c383e6a7c078f6f41d",
+      "description": "Large-payload placeholder for the official streaming / chunk-boundary vector."
+    }
+  ]
+}

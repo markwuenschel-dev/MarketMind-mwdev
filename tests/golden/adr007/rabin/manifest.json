@@ -1,0 +1,19 @@
+{
+  "suite": "rabin",
+  "version": "1.1.0",
+  "primitive": "rabin",
+  "adr": "ADR-007 v1.1",
+  "determinism_tier": "d2",
+  "languages_required": ["python-3.12", "cpp-20", "java-21"],
+  "ci_harness_gap": "Rabin polynomial and table anchors are present, but startup verification and replay coverage have not been promoted into a three-language CI job.",
+  "cases": [
+    {
+      "id": "RF-001",
+      "path": "cases/RF-001.bin",
+      "kind": "input-bytes",
+      "window_size": 48,
+      "expected_fingerprint_hex": "516e63686f710e0a",
+      "description": "Irreducible-polynomial anchor for GF(2^63) initialization."
+    }
+  ]
+}

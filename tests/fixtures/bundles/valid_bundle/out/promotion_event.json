@@ -1,0 +1,22 @@
+{
+  "schema_version": "v1",
+  "timestamp": "2026-02-21T18:30:38Z",
+  "gate_policy_hash": "sha256:0213631133afa80b1a5efb3684c51603786555d3d93164437b274033ccf515a8",
+  "gate_decision_hash": "sha256:27e9efca340947c2b49837488c09b331ed23da6ad9f77d6262bf9c5ad46308bc",
+  "intent_hash": "sha256:a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+  "plan_hash": "sha256:b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3",
+  "plan_hash_a": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "plan_hash_b": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+  "artifact_refs": [
+    {
+      "artifact_type": "identity",
+      "uri": "identity.json",
+      "content_hash": "sha256:8a267025547a88c3a0bedb09695f96d219ee8f4e880dac57cc9535f5181558c8"
+    },
+    {
+      "artifact_type": "transfer_report",
+      "uri": "transfer_report.json",
+      "content_hash": "sha256:4867ea1f782a60108acf59332f275339b9954b8c61149293874b35ad9828f24e"
+    }
+  ]
+}

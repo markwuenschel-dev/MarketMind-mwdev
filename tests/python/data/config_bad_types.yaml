@@ -1,0 +1,4 @@
+streaming:
+  buffer_size: big          # should be int
+  console: notabool         # should be bool
+  oom_guard: "false"        # string-to-bool coercion test

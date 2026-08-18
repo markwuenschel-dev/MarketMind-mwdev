@@ -1,0 +1,6 @@
+{
+  "case_id": "MH-001",
+  "hash_family_index": 0,
+  "master_seed_hex": "0000000000000000000000000000000000000000000000000000000000000000",
+  "expected_sip_key_hex": "e13e2957851155c2e0dc5da85e7762c5"
+}

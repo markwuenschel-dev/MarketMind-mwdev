@@ -1,0 +1,404 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://marketmind.ai/schemas/signal_reliability.schema.json",
+  "title": "Signal Reliability Contracts",
+  "description": "Draft-07 schema for the Signal Reliability Layer prose specification v0.1.1. Phase II semantics are advisory-only: these records are consumable metadata and must not imply hard-gate or hard-drop behavior without a separate ADR.",
+  "oneOf": [
+    {
+      "$ref": "#/definitions/SignalReliabilityState"
+    },
+    {
+      "$ref": "#/definitions/SignalReliabilityCalibration"
+    },
+    {
+      "$ref": "#/definitions/SignalReliabilityReport"
+    }
+  ],
+  "definitions": {
+    "reliabilityDimension": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "EvidenceFlags": {
+      "type": "object",
+      "description": "Availability flags for the governed evidence sources listed in Signal Reliability Layer Schema Specification v0.1.1.",
+      "additionalProperties": false,
+      "properties": {
+        "ic_history_sufficient": {
+          "type": "boolean",
+          "description": "True when at least 30 observations were available."
+        },
+        "slippage_model_available": {
+          "type": "boolean"
+        },
+        "crowding_proxy_available": {
+          "type": "boolean"
+        },
+        "crisis_window_available": {
+          "type": "boolean"
+        },
+        "peer_signals_available": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "ic_history_sufficient",
+        "slippage_model_available",
+        "crowding_proxy_available",
+        "crisis_window_available",
+        "peer_signals_available"
+      ]
+    },
+    "DimensionWeights": {
+      "type": "object",
+      "description": "Weights used in reliability_score aggregation. Keys are locked to the eight reliability dimensions; implementations must ensure they sum to 1.0.",
+      "additionalProperties": false,
+      "properties": {
+        "persistence": {
+          "$ref": "#/definitions/reliabilityDimension"
+        },
+        "slippage_sensitivity": {
+          "$ref": "#/definitions/reliabilityDimension"
+        },
+        "crowding_sensitivity": {
+          "$ref": "#/definitions/reliabilityDimension"
+        },
+        "turnover_burden": {
+          "$ref": "#/definitions/reliabilityDimension"
+        },
+        "regime_fragility": {
+          "$ref": "#/definitions/reliabilityDimension"
+        },
+        "crisis_retention": {
+          "$ref": "#/definitions/reliabilityDimension"
+        },
+        "signal_disagreement": {
+          "$ref": "#/definitions/reliabilityDimension"
+        },
+        "state_dependency": {
+          "$ref": "#/definitions/reliabilityDimension"
+        }
+      },
+      "required": [
+        "persistence",
+        "slippage_sensitivity",
+        "crowding_sensitivity",
+        "turnover_burden",
+        "regime_fragility",
+        "crisis_retention",
+        "signal_disagreement",
+        "state_dependency"
+      ]
+    },
+    "MeanReliabilityByRegime": {
+      "type": "object",
+      "description": "Mean reliability_score per 5-class regime_class.",
+      "additionalProperties": false,
+      "properties": {
+        "bull": {
+          "$ref": "#/definitions/reliabilityDimension"
+        },
+        "bear": {
+          "$ref": "#/definitions/reliabilityDimension"
+        },
+        "sideways": {
+          "$ref": "#/definitions/reliabilityDimension"
+        },
+        "high_vol": {
+          "$ref": "#/definitions/reliabilityDimension"
+        },
+        "crisis": {
+          "$ref": "#/definitions/reliabilityDimension"
+        }
+      },
+      "required": [
+        "bull",
+        "bear",
+        "sideways",
+        "high_vol",
+        "crisis"
+      ]
+    },
+    "SignalReliabilityState": {
+      "type": "object",
+      "description": "Fast-state per-signal, per-timestamp reliability record. Phase II default remains advisory-only; this metadata must not imply hard-zero or hard-drop behavior.",
+      "additionalProperties": false,
+      "properties": {
+        "signal_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "slot_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date-time",
+          "description": "PIT timestamp; no data after this timestamp may be used."
+        },
+        "signal_set_version": {
+          "type": "integer"
+        },
+        "schema_version": {
+          "type": "string",
+          "const": "v1"
+        },
+        "persistence": {
+          "$ref": "#/definitions/reliabilityDimension"
+        },
+        "slippage_sensitivity": {
+          "$ref": "#/definitions/reliabilityDimension"
+        },
+        "crowding_sensitivity": {
+          "$ref": "#/definitions/reliabilityDimension"
+        },
+        "turnover_burden": {
+          "$ref": "#/definitions/reliabilityDimension"
+        },
+        "regime_fragility": {
+          "$ref": "#/definitions/reliabilityDimension"
+        },
+        "crisis_retention": {
+          "$ref": "#/definitions/reliabilityDimension"
+        },
+        "signal_disagreement": {
+          "$ref": "#/definitions/reliabilityDimension"
+        },
+        "state_dependency": {
+          "$ref": "#/definitions/reliabilityDimension"
+        },
+        "reliability_score": {
+          "$ref": "#/definitions/reliabilityDimension"
+        },
+        "evidence_flags": {
+          "$ref": "#/definitions/EvidenceFlags"
+        },
+        "evidence_coverage": {
+          "$ref": "#/definitions/reliabilityDimension"
+        }
+      },
+      "required": [
+        "signal_id",
+        "slot_index",
+        "as_of",
+        "signal_set_version",
+        "schema_version",
+        "persistence",
+        "slippage_sensitivity",
+        "crowding_sensitivity",
+        "turnover_burden",
+        "regime_fragility",
+        "crisis_retention",
+        "signal_disagreement",
+        "state_dependency",
+        "reliability_score",
+        "evidence_flags",
+        "evidence_coverage"
+      ]
+    },
+    "SignalReliabilityCalibration": {
+      "type": "object",
+      "description": "Slow-state calibration and provenance record for a signal reliability scorer/calibration window.",
+      "additionalProperties": false,
+      "properties": {
+        "signal_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "slot_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "calibration_window_start": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "calibration_window_end": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "fit_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "signal_set_version": {
+          "type": "integer"
+        },
+        "schema_version": {
+          "type": "string",
+          "const": "v1"
+        },
+        "dimension_weights": {
+          "$ref": "#/definitions/DimensionWeights"
+        },
+        "weighting_method": {
+          "type": "string",
+          "enum": [
+            "equal",
+            "ic_weighted",
+            "learned",
+            "manual"
+          ]
+        },
+        "mean_reliability_by_regime": {
+          "$ref": "#/definitions/MeanReliabilityByRegime"
+        },
+        "reliability_ic_correlation": {
+          "type": "number"
+        },
+        "persistence_half_life_bars": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "crowding_proxy_source": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "decay_rate_estimate": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "calibration_task_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "calibration_bar_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pit_boundary": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "signal_id",
+        "slot_index",
+        "calibration_window_start",
+        "calibration_window_end",
+        "fit_version",
+        "signal_set_version",
+        "schema_version",
+        "dimension_weights",
+        "weighting_method",
+        "mean_reliability_by_regime",
+        "reliability_ic_correlation",
+        "calibration_task_count",
+        "calibration_bar_count",
+        "pit_boundary"
+      ]
+    },
+    "SignalReliabilitySummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mean_reliability": {
+          "$ref": "#/definitions/reliabilityDimension"
+        },
+        "min_reliability_signal_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "min_reliability_score": {
+          "$ref": "#/definitions/reliabilityDimension"
+        },
+        "low_evidence_signals": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "dimension_means": {
+          "$ref": "#/definitions/DimensionWeights"
+        }
+      },
+      "required": [
+        "mean_reliability",
+        "min_reliability_signal_id",
+        "min_reliability_score",
+        "low_evidence_signals",
+        "dimension_means"
+      ]
+    },
+    "SignalReliabilityCalibrationRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fit_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "calibration_window_end": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "calibration_task_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "fit_version",
+        "calibration_window_end",
+        "calibration_task_count"
+      ]
+    },
+    "SignalReliabilityReport": {
+      "type": "object",
+      "description": "Run-level governed bundle artifact for signal reliability. Emission remains advisory-only until ablation evidence and a separate ADR justify any gating promotion.",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "const": "v1"
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "signal_set_version": {
+          "type": "integer"
+        },
+        "signal_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "signals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SignalReliabilityState"
+          }
+        },
+        "summary": {
+          "$ref": "#/definitions/SignalReliabilitySummary"
+        },
+        "calibration_ref": {
+          "$ref": "#/definitions/SignalReliabilityCalibrationRef"
+        }
+      },
+      "required": [
+        "schema_version",
+        "run_id",
+        "as_of",
+        "signal_set_version",
+        "signal_count",
+        "signals",
+        "summary",
+        "calibration_ref"
+      ]
+    }
+  }
+}

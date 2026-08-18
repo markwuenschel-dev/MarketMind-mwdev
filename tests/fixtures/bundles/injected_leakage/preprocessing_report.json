@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0.0",
+  "steps": [
+    {
+      "name": "lagged_return",
+      "output": "lagged_return_1",
+      "lookahead_bars": 0
+    },
+    {
+      "name": "tomorrow_return",
+      "output": "tomorrow_return",
+      "lookahead_bars": 1
+    }
+  ],
+  "timings": {},
+  "warnings": []
+}

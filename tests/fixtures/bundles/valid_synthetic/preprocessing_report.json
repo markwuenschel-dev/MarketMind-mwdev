@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0.0",
+  "steps": [
+    {
+      "name": "lagged_return",
+      "output": "lagged_return_1",
+      "lookahead_bars": 0
+    },
+    {
+      "name": "rolling_volatility",
+      "output": "rolling_vol_5",
+      "lookahead_bars": 0
+    }
+  ],
+  "timings": {},
+  "warnings": []
+}

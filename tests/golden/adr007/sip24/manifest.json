@@ -1,0 +1,21 @@
+{
+  "suite": "sip24",
+  "version": "1.1.0",
+  "primitive": "sip24",
+  "adr": "ADR-007 v1.1",
+  "determinism_tier": "d2",
+  "languages_required": ["python-3.12", "cpp-20", "java-21"],
+  "ci_harness_gap": "The reference location is reserved, but the official 64-vector replay harness is still missing from CI.",
+  "cases": [
+    {
+      "id": "SIP-001",
+      "path": "cases/SIP-001.bin",
+      "kind": "input-bytes",
+      "namespace": "adr007.sip24",
+      "key_hex": "000102030405060708090a0b0c0d0e0f",
+      "key_id": "00000000-0000-0000-0000-000000000001",
+      "expected_digest_hex": "af2a9170b5ab75bf",
+      "description": "Placeholder for the official SipHash-2-4 reference vector corpus."
+    }
+  ]
+}

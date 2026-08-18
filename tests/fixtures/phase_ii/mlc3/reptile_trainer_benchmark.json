@@ -1,0 +1,33 @@
+{
+  "batch_bucket_counts": {
+    "bear": 1,
+    "bull": 5,
+    "crisis": 6,
+    "high_vol": 2,
+    "sideways": 2
+  },
+  "batch_size": 16,
+  "crisis_floor_fraction": 0.1,
+  "crisis_floor_met": true,
+  "description": "Synthetic bounded trainer path; records scaffold inner-loop gain and D0 replay identity. Not Tier-1 promotion, Harvey, or GATE-II evidence.",
+  "determinism_inner_adapt_replay_max_abs_delta": 0.0,
+  "governance_minimums_applied": {
+    "bear": 1,
+    "bull": 1,
+    "crisis": 1,
+    "high_vol": 1,
+    "sideways": 1
+  },
+  "mean_inner_loop_gain_query_ic": 0.04999999999999999,
+  "overall_result": "PASS",
+  "run_id": "run.sha256:6133cec55464db6a63af07f76058f75103c90a1690f505e341cbb8f53c99eace",
+  "schema_version": "mlc3.benchmark.v1",
+  "seed": 424242,
+  "trainable_pool_bucket_counts": {
+    "bear": 1,
+    "bull": 17,
+    "crisis": 9,
+    "high_vol": 1,
+    "sideways": 1
+  }
+}

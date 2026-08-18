@@ -1,0 +1,15 @@
+{
+  "schema_version": "v1",
+  "timestamp": "2026-02-21T18:51:07Z",
+  "result": "PASS",
+  "gate_policy_hash": "sha256:0213631133afa80b1a5efb3684c51603786555d3d93164437b274033ccf515a8",
+  "gate_decision_hash": "sha256:b381a5f4cd387218e6e617f19f5e7c245242df8189a18085de7d93c4e55e4e97",
+  "reasons": [],
+  "artifact_refs": [
+    {
+      "artifact_type": "identity",
+      "uri": "identity.json",
+      "content_hash": "sha256:e4671fb8e7c88554c87a5e083e9d472d5d9c12ee1f4162fe71248873e69b0c56"
+    }
+  ]
+}

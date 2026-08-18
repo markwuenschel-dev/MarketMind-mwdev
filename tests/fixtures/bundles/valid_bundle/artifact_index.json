@@ -1,0 +1,17 @@
+{
+  "schema_version": "v1",
+  "artifacts": [
+    {
+      "artifact_type": "identity",
+      "uri": "identity.json",
+      "content_hash": "sha256:8a267025547a88c3a0bedb09695f96d219ee8f4e880dac57cc9535f5181558c8",
+      "schema_version": "v1"
+    },
+    {
+      "artifact_type": "transfer_report",
+      "uri": "transfer_report.json",
+      "content_hash": "sha256:4867ea1f782a60108acf59332f275339b9954b8c61149293874b35ad9828f24e",
+      "schema_version": "v1"
+    }
+  ]
+}

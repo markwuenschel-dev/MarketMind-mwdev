@@ -1,0 +1,25 @@
+{
+  "description": "D0 identity: per-task inner adapted vectors bitwise-identical across two replays.",
+  "n_tasks": 16,
+  "overall_max_abs_delta": 0.0,
+  "per_task_max_abs_delta": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "schema_version": "mlc3.d0_replay.v1",
+  "seed": 424242
+}

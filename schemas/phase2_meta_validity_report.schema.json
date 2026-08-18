@@ -1,0 +1,516 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://marketmind.local/schemas/phase2_meta_validity_report.schema.json",
+  "title": "MarketMind Phase II Meta Validity Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_version",
+    "run_id",
+    "timestamp",
+    "non_promotable",
+    "phase",
+    "promotable_claim_emitted",
+    "governed_artifact_contract",
+    "run_identity",
+    "seed_lineage",
+    "content_hash",
+    "inner_loop_gain_by_regime",
+    "harvey_t_statistic",
+    "encoder_coherence_score",
+    "crisis_episode_ic",
+    "forgetting_metric",
+    "plasticity_metric",
+    "baseline_comparison",
+    "pit_compliance_flag",
+    "pit_boundary",
+    "signal_ids_hash",
+    "signal_surface",
+    "confidence_calibration",
+    "entry_conditions",
+    "threshold_references",
+    "overall_result"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "pattern": "^meta_validity_report\\.scaffold\\." },
+    "artifact_version": { "type": "string", "const": "mln06.phase2.contract.v1" },
+    "run_id": { "type": "string", "pattern": "^run\\.sha256:[0-9a-f]{64}$" },
+    "timestamp": { "type": "string", "minLength": 1 },
+    "non_promotable": { "type": "boolean", "const": true },
+    "phase": { "type": "string", "const": "II-0B" },
+    "promotable_claim_emitted": { "type": "boolean", "const": false },
+    "governed_artifact_contract": { "type": "boolean", "const": true },
+    "run_identity": { "$ref": "#/$defs/run_identity" },
+    "seed_lineage": { "$ref": "#/$defs/seed_lineage" },
+    "content_hash": { "$ref": "#/$defs/content_hash" },
+    "inner_loop_gain_by_regime": {
+      "type": "object",
+      "additionalProperties": { "type": "number" }
+    },
+    "harvey_t_statistic": { "type": "number" },
+    "encoder_coherence_score": { "type": "number" },
+    "crisis_episode_ic": { "type": "number" },
+    "forgetting_metric": { "type": "number" },
+    "plasticity_metric": { "type": "number" },
+    "pit_compliance_flag": { "type": "boolean" },
+    "pit_boundary": { "type": "string", "minLength": 1 },
+    "signal_ids_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "signal_surface": { "$ref": "#/$defs/signal_surface" },
+    "confidence_calibration": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["schema_version", "reporting_gate"]
+    },
+    "inference_boundary": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "baseline_comparison": {
+      "oneOf": [
+        { "$ref": "#/$defs/baseline_comparison_ii0c" },
+        { "$ref": "#/$defs/baseline_comparison_v1_populated" },
+        { "$ref": "#/$defs/baseline_comparison_v1_real_populated" },
+        { "$ref": "#/$defs/baseline_comparison_v1_absence" }
+      ]
+    },
+    "entry_conditions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase_i_f_truth_boundary_closed",
+        "phase_i_g_policy_baseline_available",
+        "replay_fixture_dependency_satisfied",
+        "governed_pit_access_path",
+        "artifact_emission_capability",
+        "frozen_incumbent_baseline_identified"
+      ],
+      "properties": {
+        "phase_i_f_truth_boundary_closed": { "type": "boolean" },
+        "phase_i_g_policy_baseline_available": { "type": "boolean" },
+        "replay_fixture_dependency_satisfied": { "type": "boolean" },
+        "governed_pit_access_path": { "type": "boolean" },
+        "artifact_emission_capability": { "type": "boolean" },
+        "frozen_incumbent_baseline_identified": { "type": "boolean" }
+      }
+    },
+    "threshold_references": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/threshold_reference" }
+    },
+    "overall_result": {
+      "type": "string",
+      "enum": ["INSUFFICIENT", "FAIL_SOFT", "FAIL_STRUCTURAL"]
+    }
+  },
+  "$defs": {
+    "baseline_comparison_ii0c": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "baseline_kind",
+        "baseline_run_id",
+        "challenger_run_id",
+        "splits_fingerprint",
+        "data_fingerprint",
+        "cost_assumptions_fingerprint",
+        "data_parity",
+        "split_parity",
+        "cost_parity",
+        "net_result_against_incumbent"
+      ],
+      "properties": {
+        "baseline_kind": { "type": "string", "const": "xgboost_incumbent" },
+        "baseline_run_id": { "type": "string", "minLength": 1 },
+        "challenger_run_id": { "type": "string", "minLength": 1 },
+        "splits_fingerprint": { "type": "string", "minLength": 1 },
+        "data_fingerprint": { "type": "string", "minLength": 1 },
+        "cost_assumptions_fingerprint": { "type": "string", "minLength": 1 },
+        "data_parity": { "type": "boolean", "const": true },
+        "split_parity": { "type": "boolean", "const": true },
+        "cost_parity": { "type": "boolean", "const": true },
+        "net_result_against_incumbent": { "type": "string", "minLength": 1 }
+      }
+    },
+    "baseline_comparison_v1_populated": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "baseline_identity",
+        "challenger_run_id",
+        "data_parity",
+        "split_parity",
+        "assumption_parity",
+        "cost_assumptions",
+        "aggregate_metrics",
+        "n_folds",
+        "task_pool_hash",
+        "threshold_references",
+        "net_result",
+        "schema_version",
+        "promotion_note"
+      ],
+      "properties": {
+        "baseline_identity": { "type": "string", "pattern": "^xgboost_.+" },
+        "challenger_run_id": { "type": "string", "pattern": "^run\\.sha256:[0-9a-f]{64}$" },
+        "data_parity": { "type": "string", "const": "synthetic_pool_matched" },
+        "split_parity": { "type": "string", "const": "walk_forward_folds_matched" },
+        "assumption_parity": { "type": "string", "const": "cost_assumptions_matched" },
+        "cost_assumptions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["spread_bps", "slippage_bps", "borrow_rate_ann"],
+          "properties": {
+            "spread_bps": { "type": "number" },
+            "slippage_bps": { "type": "number" },
+            "borrow_rate_ann": { "type": "number" }
+          }
+        },
+        "aggregate_metrics": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": [
+            "mean_net_sharpe",
+            "mean_net_sharpe_normal_null_p",
+            "mean_gross_ic",
+            "mean_crisis_ic",
+            "mean_max_drawdown",
+            "mean_turnover",
+            "n_folds_with_crisis"
+          ],
+          "properties": {
+            "mean_net_sharpe": { "type": "number" },
+            "mean_net_sharpe_normal_null_p": { "type": ["number", "null"] },
+            "mean_gross_ic": { "type": "number" },
+            "mean_crisis_ic": { "type": ["number", "null"] },
+            "mean_max_drawdown": { "type": "number" },
+            "mean_turnover": { "type": "number" },
+            "n_folds_with_crisis": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "n_folds": { "type": "integer", "minimum": 1 },
+        "task_pool_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "threshold_references": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "state", "current_expression"],
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "state": { "type": "string", "const": "PROVISIONAL" },
+              "current_expression": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "net_result": { "type": "string", "const": "STUB_PENDING_REAL_DATA" },
+        "schema_version": { "type": "string", "const": "baseline_comparison.v1" },
+        "promotion_note": { "type": "string", "minLength": 1 }
+      }
+    },
+    "baseline_comparison_v1_real_populated": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "baseline_identity",
+        "challenger_run_id",
+        "data_parity",
+        "split_parity",
+        "assumption_parity",
+        "cost_assumptions",
+        "aggregate_metrics",
+        "n_folds",
+        "task_pool_hash",
+        "threshold_references",
+        "net_result",
+        "schema_version",
+        "promotion_note",
+        "evidence_source",
+        "data_fingerprint",
+        "splits_fingerprint",
+        "cost_assumptions_fingerprint"
+      ],
+      "properties": {
+        "baseline_identity": { "type": "string", "pattern": "^xgboost_.+" },
+        "challenger_run_id": { "type": "string", "pattern": "^run\\.sha256:[0-9a-f]{64}$" },
+        "data_parity": { "type": "string", "const": "governed_real_meta_task_pool" },
+        "split_parity": { "type": "string", "const": "walk_forward_folds_matched" },
+        "assumption_parity": { "type": "string", "const": "cost_assumptions_matched" },
+        "evidence_source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "market_data_source",
+            "label_source",
+            "target_source",
+            "challenger_source",
+            "real_market_data_evidence",
+            "w1_gate_closure_eligible",
+            "pit_heterogeneity_governance_acknowledged"
+          ],
+          "properties": {
+            "market_data_source": { "type": "string", "minLength": 1 },
+            "label_source": { "type": "string", "minLength": 1 },
+            "target_source": { "type": "string", "minLength": 1 },
+            "challenger_source": { "type": "string", "minLength": 1 },
+            "real_market_data_evidence": { "type": "boolean" },
+            "w1_gate_closure_eligible": { "type": "boolean" },
+            "pit_heterogeneity_governance_acknowledged": { "type": "boolean" }
+          }
+        },
+        "data_fingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "splits_fingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "cost_assumptions_fingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "cost_assumptions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["spread_bps", "slippage_bps", "borrow_rate_ann"],
+          "properties": {
+            "spread_bps": { "type": "number" },
+            "slippage_bps": { "type": "number" },
+            "borrow_rate_ann": { "type": "number" }
+          }
+        },
+        "aggregate_metrics": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": [
+            "mean_net_sharpe",
+            "mean_net_sharpe_normal_null_p",
+            "mean_gross_ic",
+            "mean_crisis_ic",
+            "mean_max_drawdown",
+            "mean_turnover",
+            "n_folds_with_crisis"
+          ],
+          "properties": {
+            "mean_net_sharpe": { "type": "number" },
+            "mean_net_sharpe_normal_null_p": { "type": ["number", "null"] },
+            "mean_gross_ic": { "type": "number" },
+            "mean_crisis_ic": { "type": ["number", "null"] },
+            "mean_max_drawdown": { "type": "number" },
+            "mean_turnover": { "type": "number" },
+            "n_folds_with_crisis": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "n_folds": { "type": "integer", "minimum": 1 },
+        "task_pool_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "threshold_references": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "state", "current_expression"],
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "state": { "type": "string", "const": "PROVISIONAL" },
+              "current_expression": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "net_result": {
+          "type": "string",
+          "enum": [
+            "CHALLENGER_BEATS_BASELINE_NET_OF_COSTS",
+            "BASELINE_BEATS_CHALLENGER_NET_OF_COSTS",
+            "NO_DISTINGUISHABLE_NET_UPLIFT",
+            "INSUFFICIENT_REAL_DATA",
+            "INVALID_COMPARISON_PARITY_FAILURE"
+          ]
+        },
+        "schema_version": { "type": "string", "const": "baseline_comparison.v1" },
+        "promotion_note": { "type": "string", "minLength": 1 },
+        "challenger_surface": { "$ref": "#/$defs/w1_challenger_surface_summary_v1" },
+        "challenger_surface_content_hash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "row_level_aggregate_metrics": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": [
+            "mean_net_sharpe",
+            "mean_net_sharpe_normal_null_p",
+            "mean_gross_ic",
+            "mean_crisis_ic",
+            "mean_max_drawdown",
+            "mean_turnover",
+            "n_folds_with_crisis"
+          ],
+          "properties": {
+            "mean_net_sharpe": { "type": "number" },
+            "mean_net_sharpe_normal_null_p": { "type": ["number", "null"] },
+            "mean_gross_ic": { "type": "number" },
+            "mean_crisis_ic": { "type": ["number", "null"] },
+            "mean_max_drawdown": { "type": "number" },
+            "mean_turnover": { "type": "number" },
+            "n_folds_with_crisis": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "baseline_comparison_v1_absence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "net_result", "promotion_note"],
+      "properties": {
+        "schema_version": { "type": "string", "const": "baseline_comparison.v1" },
+        "net_result": { "type": "string", "const": "NOT_RUN" },
+        "promotion_note": {
+          "type": "string",
+          "const": "W1 harness not run for this evidence surface. GATE-II remains DEFERRED."
+        }
+      }
+    },
+    "w1_challenger_surface_summary_v1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "source",
+        "model_family",
+        "task_pool_hash",
+        "data_fingerprint",
+        "splits_fingerprint",
+        "cost_assumptions_fingerprint",
+        "signal_set_version",
+        "leakage_policy",
+        "uses_query_labels",
+        "uses_xgboost_outputs",
+        "uses_post_query_metrics",
+        "governed_checkpoint_lineage_verified"
+      ],
+      "properties": {
+        "schema_version": { "type": "string", "const": "w1_challenger_surface.v1" },
+        "source": { "type": "string", "minLength": 1 },
+        "model_family": { "type": "string", "minLength": 1 },
+        "task_pool_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "data_fingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "splits_fingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "cost_assumptions_fingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "signal_set_version": { "type": "string", "minLength": 1 },
+        "leakage_policy": { "type": "string", "minLength": 1 },
+        "uses_query_labels": { "type": "boolean", "const": false },
+        "uses_xgboost_outputs": { "type": "boolean", "const": false },
+        "uses_post_query_metrics": { "type": "boolean", "const": false },
+        "governed_checkpoint_lineage_verified": { "type": "boolean" },
+        "model_state_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    },
+    "content_hash": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "canonicalization", "value"],
+      "properties": {
+        "algorithm": { "type": "string", "const": "sha256" },
+        "canonicalization": {
+          "type": "string",
+          "const": "json.sort_keys.no_ws.omit_content_hash.v1"
+        },
+        "value": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    },
+    "run_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "seed", "run_id", "non_promotable"],
+      "properties": {
+        "schema_version": { "type": "string", "const": "phase2_scaffold.run_identity.v1" },
+        "seed": { "type": "integer", "minimum": 0 },
+        "run_id": { "type": "string", "pattern": "^run\\.sha256:[0-9a-f]{64}$" },
+        "non_promotable": { "type": "boolean", "const": true }
+      }
+    },
+    "seed_lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "run_seed_root", "derived_seeds"],
+      "properties": {
+        "schema_version": { "type": "string", "const": "phase2.seed_lineage.v1" },
+        "run_seed_root": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "derived_seeds": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/derived_seed" }
+        }
+      }
+    },
+    "derived_seed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["namespace", "context_string_sha256", "derived_seed_hex", "uint64_seed"],
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "enum": [
+            "task_sampling",
+            "task_window_selection",
+            "replay_curriculum_sampling",
+            "checkpoint_reference_eval"
+          ]
+        },
+        "context_string_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "derived_seed_hex": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "uint64_seed": { "type": "integer", "minimum": 0, "maximum": 18446744073709551615 }
+      }
+    },
+    "signal_surface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "contract_version",
+        "max_signals",
+        "signal_set_version",
+        "signal_ids",
+        "signal_mask",
+        "active_k",
+        "signal_ids_hash"
+      ],
+      "properties": {
+        "kind": { "type": "string", "const": "fixed_slot_masked" },
+        "contract_version": { "type": "string", "minLength": 1 },
+        "max_signals": { "type": "integer", "const": 64 },
+        "signal_set_version": { "type": "string", "minLength": 1 },
+        "signal_ids": {
+          "type": "array",
+          "minItems": 64,
+          "maxItems": 64,
+          "items": { "type": "string" }
+        },
+        "signal_mask": {
+          "type": "array",
+          "minItems": 64,
+          "maxItems": 64,
+          "items": { "type": "boolean" }
+        },
+        "active_k": { "type": "integer", "minimum": 0, "maximum": 64 },
+        "signal_ids_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    },
+    "threshold_reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "threshold_id",
+        "state",
+        "consumer",
+        "gate_critical",
+        "current_expression",
+        "usage_role",
+        "used_as_pass_fail_criterion"
+      ],
+      "properties": {
+        "threshold_id": { "type": "string", "minLength": 1 },
+        "state": { "type": "string", "enum": ["PROVISIONAL", "VALIDATED"] },
+        "consumer": { "type": "string", "minLength": 1 },
+        "gate_critical": { "type": "boolean" },
+        "current_expression": { "type": "string", "minLength": 1 },
+        "usage_role": { "type": "string", "minLength": 1 },
+        "used_as_pass_fail_criterion": { "type": "boolean" }
+      }
+    }
+  }
+}

@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://marketmind.ai/schemas/transfer_report.schema.json",
+  "title": "Transfer Report",
+  "description": "Lane A to Lane B comparison report with top-K and rank deltas.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "v1",
+      "description": "Schema version (must be 'v1' for v1 promotion)"
+    },
+    "score_policy_version": {
+      "type": "string",
+      "const": "v1",
+      "description": "Version of metric definitions/scoring used within this report"
+    },
+    "plan_hash_a": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Plan hash of Lane A (required for promotion)"
+    },
+    "plan_hash_b": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Plan hash of Lane B (required for promotion)"
+    },
+    "run_ids": {
+      "type": "array",
+      "description": "Exploratory binding only (for validate); forbidden for promotion",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "identity_a": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Backtest identity locks for Lane A",
+      "properties": {
+        "fidelity_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cost_model_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scenario_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "data_slice_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["fidelity_id", "cost_model_id", "scenario_id", "data_slice_id"]
+    },
+    "identity_b": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Backtest identity locks for Lane B",
+      "properties": {
+        "fidelity_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cost_model_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scenario_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "data_slice_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["fidelity_id", "cost_model_id", "scenario_id", "data_slice_id"]
+    },
+    "k_values": {
+      "type": "array",
+      "description": "K-values for top-K metrics",
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "minItems": 1
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Transfer metrics computed between lanes",
+      "properties": {
+        "spearman_rho": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1,
+          "description": "Spearman rank correlation coefficient"
+        },
+        "top_5_overlap": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Top-5 overlap ratio"
+        },
+        "top_10_overlap": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Top-10 overlap ratio"
+        },
+        "top_20_overlap": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Top-20 overlap ratio"
+        },
+        "false_positive_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "False positive rate"
+        }
+      },
+      "required": ["spearman_rho"]
+    },
+    "candidate_deltas": {
+      "type": "array",
+      "description": "Rank deltas for each candidate",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "candidate_key": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Stable identity of the candidate"
+          },
+          "lane_a_rank": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Rank in Lane A"
+          },
+          "lane_b_rank": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Rank in Lane B"
+          },
+          "rank_delta": {
+            "type": "integer",
+            "description": "Rank delta: lane_b_rank - lane_a_rank"
+          }
+        },
+        "required": ["candidate_key", "lane_a_rank", "lane_b_rank", "rank_delta"]
+      }
+    }
+  },
+  "required": ["schema_version", "score_policy_version", "identity_a", "identity_b", "k_values", "metrics", "candidate_deltas"]
+}

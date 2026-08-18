@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://marketmind.ai/schemas/identity.schema.json",
+  "title": "Identity",
+  "description": "Identity artifact containing candidate key, backtest identity locks, and hash set for comparability.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "v1",
+      "description": "Schema version (must be 'v1' for v1 promotion)"
+    },
+    "candidate_key": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable identity of a candidate/model/strategy"
+    },
+    "backtest_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Comparability locks (fidelity/cost/scenario/data-slice)",
+      "properties": {
+        "fidelity_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Fidelity level identifier (e.g., 'high', 'low')"
+        },
+        "cost_model_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Cost model identifier (e.g., 'fixed_2bps', 'variable_tiered')"
+        },
+        "scenario_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Scenario identifier (e.g., 'bull_market', 'bear_market')"
+        },
+        "data_slice_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Data slice identifier (e.g., '2020-2023', '2021-2024')"
+        }
+      },
+      "required": ["fidelity_id", "cost_model_id", "scenario_id", "data_slice_id"]
+    },
+    "hash_set": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Set of hashes produced with the identity artifact",
+      "properties": {
+        "intent_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$",
+          "description": "Hash of what is being tested: candidate_key + backtest_identity (excludes run noise)"
+        },
+        "plan_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$",
+          "description": "Hash of what could change outcomes: intent_hash + code/data/env/seed + other locks"
+        },
+        "code_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$",
+          "description": "Hash of the code version used"
+        },
+        "data_version_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$",
+          "description": "Hash of the data version used"
+        },
+        "env_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$",
+          "description": "Hash of the environment configuration"
+        },
+        "seed_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$",
+          "description": "Hash of the random seed(s) used"
+        }
+      },
+      "required": ["intent_hash", "plan_hash"]
+    }
+  },
+  "required": ["schema_version", "candidate_key", "backtest_identity", "hash_set"]
+}

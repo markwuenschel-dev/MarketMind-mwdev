@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0.0",
+  "task_non_exchangeability": {
+    "observed_statistic": 2.5,
+    "null_statistics": [0.1, 0.3, 0.7, 1.0, 1.2, 1.5, 1.7, 1.9, 2.0],
+    "p_value_threshold": 0.11,
+    "threshold_source": "docs/rg09/rg09_gate_spec.md Section 3 Statistical lane; threshold id RG09-V01"
+  },
+  "features": [
+    {
+      "feature_name": "lagged_return_1",
+      "lookahead_bars": 0,
+      "boundary": "episode_query_start"
+    },
+    {
+      "feature_name": "rolling_vol_5",
+      "lookahead_bars": 0,
+      "boundary": "episode_query_start"
+    }
+  ]
+}

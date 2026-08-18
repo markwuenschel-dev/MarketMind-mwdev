@@ -1,0 +1,26 @@
+{
+  "schema_version": "v1",
+  "score_policy_version": "v1",
+  "plan_hash_a": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "plan_hash_b": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+  "identity_a": {
+    "fidelity_id": "high",
+    "cost_model_id": "fixed_2bps",
+    "scenario_id": "bull_market",
+    "data_slice_id": "2020-2023"
+  },
+  "identity_b": {
+    "fidelity_id": "low",
+    "cost_model_id": "fixed_2bps",
+    "scenario_id": "bull_market",
+    "data_slice_id": "2020-2023"
+  },
+  "k_values": [5, 10, 20],
+  "metrics": {
+    "spearman_rho": 0.85,
+    "top_5_overlap": 0.80,
+    "top_10_overlap": 0.75,
+    "top_20_overlap": 0.70
+  },
+  "candidate_deltas": []
+}

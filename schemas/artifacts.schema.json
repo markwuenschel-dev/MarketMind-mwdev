@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://marketmind.ai/schemas/artifacts.schema.json",
+  "title": "Artifact Index",
+  "description": "Manifest of produced artifacts with their URIs and content hashes.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "v1",
+      "description": "Schema version (must be 'v1' for v1 promotion)"
+    },
+    "artifacts": {
+      "type": "array",
+      "description": "List of artifact manifests",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "One entry in artifact_index.artifacts[]",
+        "properties": {
+          "artifact_type": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Type of artifact (e.g., 'identity', 'transfer_report', 'backtest_results')"
+          },
+          "uri": {
+            "type": "string",
+            "minLength": 1,
+            "description": "URI to resolve the artifact (relative path, absolute path, or file:// URI)"
+          },
+          "content_hash": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$",
+            "description": "SHA-256 hash of canonicalized JSON artifact payload"
+          },
+          "schema_version": {
+            "type": "string",
+            "const": "v1",
+            "description": "Schema version of the artifact"
+          }
+        },
+        "required": ["artifact_type", "uri", "content_hash", "schema_version"]
+      },
+      "minItems": 1
+    }
+  },
+  "required": ["schema_version", "artifacts"]
+}

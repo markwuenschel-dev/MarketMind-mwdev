@@ -1,0 +1,19 @@
+{
+  "suite": "xxh3",
+  "version": "1.1.0",
+  "primitive": "xxh3",
+  "adr": "ADR-007 v1.1",
+  "determinism_tier": "d2",
+  "languages_required": ["python-3.12", "cpp-20", "java-21"],
+  "ci_harness_gap": "The vector location is locked, but XXH3 certification remains pending because the repo does not yet replay vectors in all three runtimes.",
+  "cases": [
+    {
+      "id": "XH-001",
+      "path": "cases/XH-001.bin",
+      "kind": "input-bytes",
+      "replay_mode": "python-fallback",
+      "expected_digest_hex": "a0d47a4d95426b1c5d628cdfcdbf013a",
+      "description": "Ephemeral XXH3-64 anchor placeholder for the ADR-007 seed-zero vector."
+    }
+  ]
+}

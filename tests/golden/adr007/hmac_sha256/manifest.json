@@ -1,0 +1,19 @@
+{
+  "suite": "hmac_sha256",
+  "version": "1.1.0",
+  "primitive": "hmac_sha256",
+  "adr": "ADR-007 v1.1",
+  "determinism_tier": "d2",
+  "languages_required": ["python-3.12", "cpp-20", "java-21"],
+  "ci_harness_gap": "Seed-derivation vectors have a reserved home, but the repo does not yet execute the same hierarchy checks across Python, C++, and Java.",
+  "cases": [
+    {
+      "id": "HM-001",
+      "path": "cases/HM-001.bin",
+      "kind": "context-bytes",
+      "master_seed_hex": "0000000000000000000000000000000000000000000000000000000000000000",
+      "expected_digest_hex": "d80ad167aea9fc3ce79bbd41d41ea09dc017382dafd20b5ac46f70c6874365f4",
+      "description": "Master-key and context placeholder for deterministic seed derivation."
+    }
+  ]
+}

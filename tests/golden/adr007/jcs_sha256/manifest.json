@@ -1,0 +1,23 @@
+{
+  "suite": "jcs_sha256",
+  "version": "1.1.0",
+  "primitive": "jcs_sha256",
+  "adr": "ADR-007 v1.1",
+  "determinism_tier": "d2",
+  "languages_required": ["python-3.12", "cpp-20", "java-21"],
+  "ci_harness_gap": "Attestation vectors are documented here, but the repo still lacks an automated three-language replay harness.",
+  "cases": [
+    {
+      "id": "AT-001",
+      "path": "cases/AT-001.json",
+      "kind": "json-payload",
+      "description": "JCS canonical ordering anchor for a small artifact payload."
+    },
+    {
+      "id": "AT-002",
+      "path": "cases/AT-002.json",
+      "kind": "json-payload",
+      "description": "JCS normalization anchor covering nested arrays and unsorted keys."
+    }
+  ]
+}

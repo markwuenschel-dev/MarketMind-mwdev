@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://marketmind.ai/schemas/promotion_event.schema.json",
+  "title": "Promotion Event",
+  "description": "Append-only promotion record emitted only on PASS in promote mode.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "v1",
+      "description": "Schema version"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of the promotion"
+    },
+    "gate_policy_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Hash of canonicalized policy + schema manifests"
+    },
+    "gate_decision_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Deterministic hash of decision inputs"
+    },
+    "intent_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Hash of what is being tested (strategy-level identity)"
+    },
+    "plan_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Hash of exact configuration (run-level provenance)"
+    },
+    "plan_hash_a": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Plan hash of Lane A from transfer report"
+    },
+    "plan_hash_b": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Plan hash of Lane B from transfer report"
+    },
+    "artifact_refs": {
+      "type": "array",
+      "description": "References to all evaluated artifacts",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "artifact_type": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Type of artifact"
+          },
+          "uri": {
+            "type": "string",
+            "minLength": 1,
+            "description": "URI of the artifact"
+          },
+          "content_hash": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$",
+            "description": "Content hash of the artifact"
+          }
+        },
+        "required": ["artifact_type", "uri", "content_hash"]
+      }
+    }
+  },
+  "required": ["schema_version", "timestamp", "gate_policy_hash", "gate_decision_hash", "intent_hash", "plan_hash", "plan_hash_a", "plan_hash_b", "artifact_refs"]
+}

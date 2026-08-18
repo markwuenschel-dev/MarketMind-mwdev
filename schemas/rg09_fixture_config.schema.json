@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://marketmind.local/schemas/rg09_fixture_config.schema.json",
+  "title": "BOCPDRegimeService fixture config (BOCPDConfig)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "hazard_rate",
+    "observation_model",
+    "prior_kappa0",
+    "prior_alpha0",
+    "max_run_length",
+    "vol_window",
+    "trend_window",
+    "trend_flat_epsilon",
+    "vol_bucket_method",
+    "cp_threshold",
+    "transition_threshold",
+    "transition_max_rl",
+    "cold_start_burn_in",
+    "config_version"
+  ],
+  "properties": {
+    "hazard_rate": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+    "observation_model": { "type": "string", "enum": ["student_t", "gaussian"] },
+    "prior_mu0": { "type": ["number", "null"] },
+    "prior_kappa0": { "type": "number", "exclusiveMinimum": 0 },
+    "prior_alpha0": { "type": "number", "exclusiveMinimum": 0 },
+    "prior_beta0": { "type": ["number", "null"], "exclusiveMinimum": 0 },
+    "max_run_length": { "type": "integer", "minimum": 1, "maximum": 512 },
+    "vol_window": { "type": "integer", "minimum": 1 },
+    "trend_window": { "type": "integer", "minimum": 1 },
+    "trend_flat_epsilon": { "type": "number", "minimum": 0 },
+    "vol_bucket_method": { "type": "string", "enum": ["tercile", "quintile"] },
+    "cp_threshold": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+    "transition_threshold": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+    "transition_max_rl": { "type": "integer", "minimum": 0 },
+    "cold_start_burn_in": { "type": "integer", "minimum": 0 },
+    "crisis_vol_score_percentile": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 100
+    },
+    "config_version": { "type": "string", "pattern": "^rg09_v[0-9]+\\.[0-9]+\\.[0-9]+$" }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "suite": "simhash",
+  "version": "1.1.0",
+  "primitive": "simhash",
+  "adr": "ADR-007 v1.1",
+  "determinism_tier": "d2",
+  "languages_required": ["python-3.12", "cpp-20", "java-21"],
+  "ci_harness_gap": "Projection-matrix vectors are staged here, but the approximate-similarity replay job has not been implemented in CI.",
+  "cases": [
+    {
+      "id": "SH-001",
+      "path": "cases/SH-001.json",
+      "kind": "json-metadata",
+      "description": "Hyperplane-seed anchor for the corrected dim-aware SimHash projection."
+    }
+  ]
+}

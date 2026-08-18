@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0.0",
+  "dataset_id": "injected_leakage",
+  "symbols": ["SYN"],
+  "row_count": 40,
+  "time_range": {
+    "start": "2026-01-01T00:00:00Z",
+    "end": "2026-02-09T00:00:00Z"
+  },
+  "pit_compliant": true,
+  "knowledge_time_column": "decision_ts"
+}

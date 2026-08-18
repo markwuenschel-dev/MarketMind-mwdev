@@ -1,0 +1,20 @@
+{
+  "schema_version": "v1",
+  "run_id": "run.sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "overall_result": "PASS",
+  "reporting_gate": "MLC3_SCAFFOLD",
+  "inner_loop_gain": {
+    "mean_query_ic": null,
+    "harvey_t": null,
+    "by_regime_class": null
+  },
+  "shuffle_test_p_value": null,
+  "proxy_IC_pearson_r": null,
+  "crisis_holdout_ic": null,
+  "forgetting_ic_degradation_pct": null,
+  "task_pool_counts": null,
+  "confidence_calibration": null,
+  "fail_reasons": [],
+  "theta_day_prime_promoted": true,
+  "timestamp_utc": "2026-04-20T00:00:00Z"
+}

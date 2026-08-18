@@ -1,0 +1,668 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "config_schema.json",
+  "title": "MarketMind Pipeline Configuration",
+  "type": "object",
+  "additionalProperties": true,
+  "unevaluatedProperties": true,
+
+  "properties": {
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "schema_uri": { "type": "string", "enum": ["config_schema.json"] },
+
+    "includes": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+
+    "active_profiles": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+
+    "profiles": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/overlay" }
+    },
+
+    "list_merge_strategy": {
+      "enum": ["replace", "append", "unique"]
+    },
+
+    "data_source": {
+      "oneOf": [
+        { "$ref": "#/$defs/data_source_csv" },
+        { "$ref": "#/$defs/data_source_influxdb" }
+      ]
+    },
+
+    "preprocessing": { "$ref": "#/$defs/preprocessing" },
+
+    "cleaning": { "$ref": "#/$defs/cleaning" },
+
+    "streaming": { "$ref": "#/$defs/streaming" },
+
+    "error_handling": { "$ref": "#/$defs/error_handling" },
+
+    "model": { "$ref": "#/$defs/model" },
+
+    "logging": { "$ref": "#/$defs/logging" },
+
+    "security": { "$ref": "#/$defs/security" },
+
+    "backtesting": { "$ref": "#/$defs/backtesting" },
+
+    "distributed_processing": { "$ref": "#/$defs/distributed_processing" },
+
+    "alternative_data": { "$ref": "#/$defs/alternative_data" },
+
+    "market_data_sources": { "type": "array", "items": { "type": "object" } },
+
+    "real_time_market_data": { "$ref": "#/$defs/real_time_market_data" },
+
+    "anomaly_detection": { "$ref": "#/$defs/anomaly_detection" }
+  },
+
+  "required": ["version", "schema_uri", "data_source", "preprocessing"],
+
+  "$defs": {
+    "path": { "type": "string", "minLength": 1 },
+    "pct01": { "type": "number", "minimum": 0, "maximum": 1 },
+
+    "data_source_csv": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "type": { "type": "string", "enum": ["csv"] },
+        "path": { "$ref": "#/$defs/path" },
+        "chunksize": { "type": "integer", "minimum": 0 },
+        "use_dask": { "type": "boolean" },
+        "compression": { "type": ["string", "null"] },
+        "data_format": { "type": "string" },
+        "polars_read_opts": {
+          "type": "object",
+          "description": "Keyword args forwarded to pl.read_csv / pl.read_ipc.",
+          "additionalProperties": { "type": ["string", "number", "boolean"] }
+        }
+      },
+      "required": ["type", "path"]
+    },
+
+    "data_source_influxdb": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "type": { "type": "string", "enum": ["influxdb"] },
+        "host": { "type": "string" },
+        "port": { "type": "integer" },
+        "token": { "type": "string" },
+        "org": { "type": "string" },
+        "bucket": { "type": "string" },
+        "query": { "type": "string" }
+      },
+      "required": ["type", "host", "port", "token", "org", "bucket", "query"]
+    },
+
+    "clip": {
+      "type": "object",
+      "properties": {
+        "min": { "type": "number" },
+        "max": { "type": "number" }
+      },
+      "required": ["min", "max"],
+      "additionalProperties": false
+    },
+
+    "rsi": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "window": { "type": "integer", "minimum": 1 },
+        "fillna_method": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+
+    "macd": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "fast_period": { "type": "integer", "minimum": 1 },
+        "slow_period": { "type": "integer", "minimum": 1 },
+        "signal_period": { "type": "integer", "minimum": 1 },
+        "fillna_method": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+
+    "technical_indicators": {
+      "type": "object",
+      "properties": {
+        "rsi": { "$ref": "#/$defs/rsi" },
+        "macd": { "$ref": "#/$defs/macd" },
+        "atr": { "type": "object", "additionalProperties": true },
+        "vwap": { "type": "object", "additionalProperties": true },
+        "bollinger_bands": { "type": "object", "additionalProperties": true },
+        "extra_indicators": { "type": "object", "additionalProperties": true }
+      },
+      "additionalProperties": true
+    },
+
+    "normalization": {
+      "type": "object",
+      "properties": {
+        "method": { "type": "string", "enum": ["standard", "minmax", "robust", "z_score"] },
+        "rolling_window": { "type": "integer", "minimum": 1 },
+        "clip_extremes": { 
+          "oneOf": [
+            { "$ref": "#/$defs/clip" },
+            { "type": "boolean" }
+          ]
+        }
+      },
+      "required": ["method", "rolling_window", "clip_extremes"],
+      "additionalProperties": false
+    },
+
+    "calendar_features": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "day_of_week": { "type": "boolean" },
+        "holidays": { "type": "array", "items": { "type": "string" } },
+        "timezones": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+
+    "macro_grid": {
+      "type": "object",
+      "description": "Map of parameter -> scalar or array of scalars",
+      "additionalProperties": {
+        "oneOf": [
+          { "type": ["string", "number", "boolean"] },
+          { "type": "array", "items": { "type": ["string", "number", "boolean"] } }
+        ]
+      }
+    },
+
+    "preprocessing": {
+      "type": "object",
+      "properties": {
+        "technical_indicators": { "$ref": "#/$defs/technical_indicators" },
+        "normalization": { "$ref": "#/$defs/normalization" },
+        "calendar_features": { "$ref": "#/$defs/calendar_features" },
+        "custom_features": { "type": "object", "additionalProperties": true },
+        "step_macros": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/macro_grid" }
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "op":        { "type": "string" },
+              "use_macro": { "type": "string" }
+            },
+            "oneOf": [
+              { "required": ["op"] },
+              { "required": ["use_macro"] }
+            ]
+          }
+        }
+      },
+      "required": ["technical_indicators", "normalization"],
+      "additionalProperties": true
+    },
+
+    "cleaning": {
+      "type": "object",
+      "properties": {
+        "combos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "when": { "type": "object", "additionalProperties": true }
+            },
+            "required": ["name"],
+            "additionalProperties": true
+          }
+        },
+        "missing_values": {
+          "type": "object",
+          "properties": {
+            "method": { "type": "string" },
+            "limit": { "type": "integer" }
+          },
+          "additionalProperties": true
+        },
+        "outliers": {
+          "type": "object",
+          "properties": {
+            "method": { "type": "string" },
+            "threshold": { "type": "number" }
+          },
+          "additionalProperties": true
+        },
+        "denoising": {
+          "type": "object",
+          "properties": {
+            "method": { "type": "string" },
+            "level": { "type": "integer" }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "streaming": {
+      "type": "object",
+      "properties": {
+        "batch_size": { "type": "integer", "minimum": 0 },
+        "update_interval_seconds": { "type": "integer", "minimum": 0 },
+        "buffer_size": { "type": "integer", "minimum": 0 },
+        "max_latency_ms": { "type": "integer", "minimum": 0 },
+        "buffer_retention_seconds": { "type": "integer", "minimum": 0 },
+        "event_triggers": { "type": "object", "additionalProperties": { "type": "string" } },
+        "priority_queue": { "type": "string" },
+        "failure_recovery": { "type": "object", "additionalProperties": true },
+        "sync_interval_seconds": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": true
+    },
+
+    "retry_policy": {
+      "type": "object",
+      "properties": {
+        "max_attempts": { "type": "integer", "minimum": 0 },
+        "initial_backoff_seconds": { "type": "integer", "minimum": 0 },
+        "max_backoff_seconds": { "type": "integer", "minimum": 0 },
+        "retry_strategy": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+
+    "validation_thresholds": {
+      "type": "object",
+      "properties": {
+        "max_missing_ratio": { "$ref": "#/$defs/pct01" },
+        "max_outlier_ratio": { "$ref": "#/$defs/pct01" }
+      },
+      "additionalProperties": true
+    },
+
+    "fallback": {
+      "type": "object",
+      "properties": {
+        "twitter": { "type": "string" },
+        "esg": { "type": "string" },
+        "data_source": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+
+    "alerting": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "channel": { "type": "string" },
+        "critical_failures": { "type": "array", "items": { "type": "string" } },
+        "alert_severity": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+
+    "error_handling": {
+      "type": "object",
+      "properties": {
+        "retry_policy": { "$ref": "#/$defs/retry_policy" },
+        "validation_thresholds": { "$ref": "#/$defs/validation_thresholds" },
+        "fallback": { "$ref": "#/$defs/fallback" },
+        "alerting": { "$ref": "#/$defs/alerting" },
+        "fallback_timeout_seconds": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": true
+    },
+
+    "model_architecture": {
+      "type": "object",
+      "properties": {
+        "num_layers": { "type": "integer", "minimum": 1 },
+        "hidden_size": { "type": "integer", "minimum": 1 },
+        "dropout": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "additionalProperties": true
+    },
+
+    "model": {
+      "type": "object",
+      "properties": {
+        "model_type": { "type": "string" },
+        "architecture": { "$ref": "#/$defs/model_architecture" },
+        "sequence_length": { "type": "integer", "minimum": 1 },
+        "prediction_horizon": { "type": "integer", "minimum": 1 },
+        "feature_list": { "type": "array", "items": { "type": "string" } },
+        "training_device": { "type": "string" },
+        "model_checkpoint": { "type": "object", "additionalProperties": true },
+        "feature_importance": { "type": "object", "additionalProperties": true },
+        "onnx_export": { "type": "object", "additionalProperties": true }
+      },
+      "additionalProperties": true
+    },
+
+    "file_output": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "path": { "type": "string" },
+        "rotation": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+
+    "influxdb_output": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "host": { "type": "string" },
+        "port": { "type": "integer" },
+        "token": { "type": "string" },
+        "org": { "type": "string" },
+        "bucket": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+
+    "outputs": {
+      "type": "object",
+      "properties": {
+        "console": { "type": "boolean" },
+        "file": { "$ref": "#/$defs/file_output" },
+        "influxdb": { "$ref": "#/$defs/influxdb_output" }
+      },
+      "additionalProperties": true
+    },
+
+    "metric_aggregation": {
+      "type": "object",
+      "properties": {
+        "aggregation_window_seconds": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": true
+    },
+
+    "dashboard_config": {
+      "type": "object",
+      "properties": {
+        "grafana_url": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+
+    "logging": {
+      "type": "object",
+      "properties": {
+        "level": { "type": "string" },
+        "outputs": { "$ref": "#/$defs/outputs" },
+        "metrics_report_interval_seconds": { "type": "integer", "minimum": 0 },
+        "custom_metrics": { "type": "array", "items": { "type": "string" } },
+        "model_metrics": { "type": "array", "items": { "type": "string" } },
+        "metric_aggregation": { "$ref": "#/$defs/metric_aggregation" },
+        "log_sampling_rate": { "type": "number", "minimum": 0, "maximum": 1 },
+        "dashboard_config": { "$ref": "#/$defs/dashboard_config" }
+      },
+      "additionalProperties": true
+    },
+
+    "encryption": {
+      "type": "object",
+      "properties": {
+        "at_rest": { "type": "boolean" },
+        "in_transit": { "type": "boolean" },
+        "encryption_algorithm": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+
+    "credentials": {
+      "type": "object",
+      "additionalProperties": true
+    },
+
+    "data_anonymization": {
+      "type": "object",
+      "properties": {
+        "anonymize_pii": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+
+    "compliance": {
+      "type": "object",
+      "properties": {
+        "audit_log": { "type": "boolean" },
+        "retention_days": { "type": "integer", "minimum": 0 },
+        "audit_frequency_days": { "type": "integer", "minimum": 0 },
+        "data_anonymization": { "$ref": "#/$defs/data_anonymization" }
+      },
+      "additionalProperties": true
+    },
+
+    "security": {
+      "type": "object",
+      "properties": {
+        "encryption": { "$ref": "#/$defs/encryption" },
+        "key_management": { "type": "string" },
+        "credentials": { "$ref": "#/$defs/credentials" },
+        "compliance": { "$ref": "#/$defs/compliance" }
+      },
+      "additionalProperties": true
+    },
+
+    "risk_management": {
+      "type": "object",
+      "properties": {
+        "stop_loss": { "type": "number" },
+        "max_drawdown": { "type": "number" }
+      },
+      "additionalProperties": true
+    },
+
+    "date_range": {
+      "type": "object",
+      "properties": {
+        "start": { "type": "string" },
+        "end": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+
+    "position_sizing": {
+      "type": "object",
+      "properties": {
+        "method": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+
+    "backtesting": {
+      "type": "object",
+      "properties": {
+        "initial_capital": { "type": "number" },
+        "transaction_cost_rate": { "type": "number" },
+        "slippage_rate": { "type": "number" },
+        "strategy_list": { "type": "array", "items": { "type": "string" } },
+        "risk_management": { "$ref": "#/$defs/risk_management" },
+        "date_range": { "$ref": "#/$defs/date_range" },
+        "performance_metrics": { "type": "array", "items": { "type": "string" } },
+        "position_sizing": { "$ref": "#/$defs/position_sizing" },
+        "benchmark_index": { "type": "string" },
+        "backtest_frequency": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+
+    "distributed_processing": {
+      "type": "object",
+      "properties": {
+        "framework": { "type": "string" },
+        "num_workers": { "type": "integer", "minimum": 0 },
+        "memory_per_worker": { "type": "string" },
+        "cluster_type": { "type": "string" },
+        "min_rows_for_distributed": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": true
+    },
+
+    "rate_limit": {
+      "type": "object",
+      "properties": {
+        "per_minute": { "type": "integer" },
+        "max_calls_per_window": { "type": "integer" },
+        "window_seconds": { "type": "integer" }
+      },
+      "additionalProperties": true
+    },
+
+    "twitter": {
+      "type": "object",
+      "properties": {
+        "base_url": { "type": "string" },
+        "bearer_token": { "type": "string" },
+        "authentication_type": { "type": "string" },
+        "endpoints": { "type": "object", "additionalProperties": { "type": "string" } },
+        "default_params": { "type": "object", "additionalProperties": true },
+        "rate_limit": { "$ref": "#/$defs/rate_limit" },
+        "retry_after_header": { "type": "string" },
+        "timeout_seconds": { "type": "integer" },
+        "cache_duration_hours": { "type": "integer" },
+        "data_resolution": { "type": "string" },
+        "api_key": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+
+    "esg": {
+      "type": "object",
+      "properties": {
+        "base_url": { "type": "string" },
+        "api_key": { "type": "string" },
+        "authentication_type": { "type": "string" },
+        "endpoints": { "type": "object", "additionalProperties": { "type": "string" } },
+        "default_params": { "type": "object", "additionalProperties": { "type": "string" } },
+        "timeout_seconds": { "type": "integer" },
+        "cache_duration_hours": { "type": "integer" },
+        "data_resolution": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+
+    "fred": {
+      "type": "object",
+      "properties": {
+        "base_url": { "type": "string" },
+        "api_key": { "type": "string" },
+        "authentication_type": { "type": "string" },
+        "endpoints": { "type": "object", "additionalProperties": { "type": "string" } },
+        "default_params": { "type": "object", "additionalProperties": { "type": "string" } },
+        "rate_limit": { "$ref": "#/$defs/rate_limit" },
+        "timeout_seconds": { "type": "integer" },
+        "cache_duration_hours": { "type": "integer" },
+        "data_resolution": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+
+    "bloomberg": {
+      "type": "object",
+      "properties": {
+        "base_url": { "type": "string" },
+        "api_key": { "type": "string" },
+        "authentication_type": { "type": "string" },
+        "endpoints": { "type": "object", "additionalProperties": { "type": "string" } },
+        "default_params": { "type": "object", "additionalProperties": { "type": "string" } },
+        "rate_limit": { "$ref": "#/$defs/rate_limit" },
+        "timeout_seconds": { "type": "integer" },
+        "cache_duration_hours": { "type": "integer" },
+        "data_resolution": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+
+    "weather": {
+      "type": "object",
+      "properties": {
+        "base_url": { "type": "string" },
+        "api_key": { "type": "string" },
+        "authentication_type": { "type": "string" },
+        "endpoints": { "type": "object", "additionalProperties": { "type": "string" } },
+        "default_params": { "type": "object", "additionalProperties": { "type": "string" } },
+        "rate_limit": { "$ref": "#/$defs/rate_limit" },
+        "timeout_seconds": { "type": "integer" },
+        "cache_duration_hours": { "type": "integer" },
+        "data_resolution": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+
+    "alternative_data": {
+      "type": "object",
+      "properties": {
+        "twitter": { "$ref": "#/$defs/twitter" },
+        "alpaca": { "type": "object", "additionalProperties": true },
+        "esg": { "$ref": "#/$defs/esg" },
+        "fred": { "$ref": "#/$defs/fred" },
+        "bloomberg": { "$ref": "#/$defs/bloomberg" },
+        "weather": { "$ref": "#/$defs/weather" }
+      },
+      "additionalProperties": true
+    },
+
+    "interactive_brokers": {
+      "type": "object",
+      "properties": {
+        "host": { "type": "string" },
+        "port": { "type": "integer" },
+        "client_id": { "type": "integer" },
+        "subscription_topics": { "type": "array", "items": { "type": "string" } },
+        "api_key": { "type": "string" },
+        "endpoint": { "type": "string" },
+        "connection_timeout_seconds": { "type": "integer" },
+        "priority": { "type": "integer" },
+        "what_to_show": { "type": "string" },
+        "use_rth": { "type": "boolean" },
+        "format_date": { "type": "integer" }
+      },
+      "additionalProperties": true
+    },
+
+    "real_time_market_data": {
+      "type": "object",
+      "properties": {
+        "interactive_brokers": { "$ref": "#/$defs/interactive_brokers" },
+        "alpaca": { "type": "object", "additionalProperties": true }
+      },
+      "additionalProperties": true
+    },
+
+    "anomaly_detection": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "method": { "type": "string" },
+        "params": { "type": "object", "additionalProperties": true }
+      },
+      "additionalProperties": true
+    },
+
+    "overlay": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}
