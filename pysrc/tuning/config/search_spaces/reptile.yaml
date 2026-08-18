@@ -1,0 +1,27 @@
+# search_space: reptile (meta-learning) v1.0.0
+name: reptile
+version: "1.0.0"
+model_type: reptile
+dimensions:
+  - name: inner_lr
+    kind: log_real
+    low: 0.0001
+    high: 0.01
+    prior: log-uniform
+  - name: outer_lr
+    kind: log_real
+    low: 0.0001
+    high: 0.01
+    prior: log-uniform
+  - name: inner_steps
+    kind: int
+    low: 5
+    high: 50
+    prior: uniform
+  - name: meta_batch_size
+    kind: int
+    low: 4
+    high: 32
+    prior: uniform
+fixed:
+  gradient_clip: 1.0

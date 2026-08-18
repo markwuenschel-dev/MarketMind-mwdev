@@ -1,0 +1,98 @@
+# Research lane: fetch (SIP market_data stage) -> clean -> IndicatorEngineStep -> materialize.
+
+version: "1.0.0"
+
+
+
+data:
+
+  allow_empty: false
+
+
+
+fetch:
+
+  engine: market_data
+
+  mode: panel
+
+  market_data:
+
+    default_source: sip_adjusted_panel
+
+    source_configs:
+
+      sip_adjusted_panel:
+
+        path: data/massive/us_stocks_sip/adjusted_day_panel_v1
+
+        workers: 1
+
+        apply_base_panel: true
+
+
+
+pipeline:
+
+  cleaning:
+
+    governance_mode: governed
+
+    determinism_tier: d1
+
+    use: default
+
+    combos:
+
+      - name: default
+
+        when:
+
+          frequency: daily
+
+        steps:
+
+          - step_id: validate.schema
+
+            step_type: validate.schema
+
+            version: "1"
+
+            params:
+
+              ohlcv_mode: true
+
+              strict: false
+
+        order:
+
+          before:
+
+            validate.schema: []
+
+  preprocessing:
+
+    steps:
+
+      - type: indicator_engine
+
+        params:
+
+          workers: 1
+
+
+
+outputs:
+
+  indicator_panel:
+
+    enabled: true
+
+    processed_data_root: data/processed
+
+
+
+execution:
+
+  backend: polars
+

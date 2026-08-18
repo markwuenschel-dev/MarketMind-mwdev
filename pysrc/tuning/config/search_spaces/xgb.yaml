@@ -1,0 +1,33 @@
+# search_space: xgb v1.0.0
+name: xgb
+version: "1.0.0"
+model_type: xgboost
+dimensions:
+  - name: max_depth
+    kind: int
+    low: 3
+    high: 10
+    prior: uniform
+  - name: learning_rate
+    kind: log_real
+    low: 0.001
+    high: 0.3
+    prior: log-uniform
+  - name: subsample
+    kind: real
+    low: 0.5
+    high: 1.0
+    prior: uniform
+  - name: colsample_bytree
+    kind: real
+    low: 0.5
+    high: 1.0
+    prior: uniform
+  - name: n_estimators
+    kind: int
+    low: 50
+    high: 500
+    prior: uniform
+fixed:
+  tree_method: hist
+  eval_metric: logloss

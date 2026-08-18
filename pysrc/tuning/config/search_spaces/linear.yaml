@@ -1,0 +1,16 @@
+# search_space: linear v1.0.0
+name: linear
+version: "1.0.0"
+model_type: ridge
+dimensions:
+  - name: alpha
+    kind: log_real
+    low: 0.0001
+    high: 100.0
+    prior: log-uniform
+  - name: fit_intercept
+    kind: categorical
+    choices: [true, false]
+fixed:
+  solver: auto
+  max_iter: 1000

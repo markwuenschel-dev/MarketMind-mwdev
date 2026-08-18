@@ -1,0 +1,9 @@
+# validation: crisis_holdout v1.0.0
+name: crisis_holdout
+version: "1.0.0"
+method: crisis_holdout
+n_splits: 3
+embargo_periods: 10
+crisis_holdout: true
+cost_stress_bps: 5.0
+min_train_periods: 252

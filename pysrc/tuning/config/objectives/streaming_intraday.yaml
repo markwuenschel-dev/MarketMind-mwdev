@@ -1,0 +1,14 @@
+# objective: streaming_intraday v1.0.0
+name: streaming_intraday
+version: "1.0.0"
+direction: maximize
+metrics:
+  - realized_pnl
+  - latency_ms
+  - fill_ratio
+weights:
+  realized_pnl: 1.0
+  latency_ms: -0.2
+  fill_ratio: 0.3
+penalty_refs: []
+max_turnover: 50.0

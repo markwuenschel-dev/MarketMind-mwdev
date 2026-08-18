@@ -1,0 +1,7 @@
+# promotion: full_promotion v1.0.0
+name: full_promotion
+version: "1.0.0"
+mode: full
+shadow_duration_days: 5
+rollback_policy: manual
+approval_required: true

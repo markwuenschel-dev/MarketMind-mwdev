@@ -1,0 +1,395 @@
+version: "1.0.0"
+schema_uri: "config_schema.json"
+
+includes:
+  - "base.yaml"  # Example: Load shared base pipeline_config (optional; file not provided here)
+
+active_profiles:
+  - "dev"  # Example: Activate 'dev' profile overrides
+
+profiles:
+  dev:
+    data_source:
+      path: "dev_data.csv"  # Override for dev
+  prod:
+    data_source:
+      path: "prod_data.csv"
+
+list_merge_strategy: "unique"  # Global list merge behavior (replace|append|unique)
+
+data_source:
+  type: "csv"
+  path: "data/market_data.csv"
+  chunksize: 10000
+  use_dask: true
+  compression: "gzip"
+  data_format: "csv"
+  # --- NEW ---
+  polars_read_opts:
+    infer_schema_length: 5000
+    null_values: ["", "NA"]
+
+# Alternative: InfluxDB example (uncomment to use)
+# data_source:
+#   type: "influxdb"
+#   host: "localhost"
+#   port: 8086
+#   token: "${INFLUX_TOKEN:?Missing token}"
+#   org: "marketmind"
+#   bucket: "market_data"
+#   query: "from(bucket: \"market_data\") |> range(start: -1d)"
+
+preprocessing:
+  technical_indicators:
+    rsi:
+      enabled: true
+      window: 14
+      fillna_method: "ffill"
+    macd:
+      enabled: true
+      fast_period: 12
+      slow_period: 26
+      signal_period: 9
+      fillna_method: "ffill"
+    atr:
+      enabled: false
+      window: 14
+      fillna_method: "ffill"
+    vwap:
+      enabled: true
+      reset_period: "daily"
+      fillna_method: "ffill"
+    bollinger_bands:
+      enabled: true
+      window: 20
+      std_dev: 2.0
+      fillna_method: "ffill"
+    extra_indicators:
+      ema:
+        enabled: true
+        period: 20
+
+  normalization:
+    method: "minmax"  # standard|minmax|robust
+    rolling_window: 100
+    clip_extremes:
+      min: -3.0
+      max: 3.0
+
+  calendar_features:
+    enabled: true
+    day_of_week: true
+    holidays:
+      - "2025-01-01"
+      - "2025-12-25"
+    timezones:
+      - "UTC"
+      - "America/New_York"
+
+  custom_features:
+    sentiment:
+      enabled: true
+      source: "twitter"
+      sentiment_model: "vader"
+    esg_normalized:
+      enabled: false
+      method: "zscore"
+
+  step_macros:
+    grid1:
+      op: ["scale", "sequence"]
+      param: [10, 20]
+
+  steps:
+    - op: "validate"
+      level: "strict"
+    - op: "impute"
+      method: "kalman"
+
+pipeline:
+  cleaning:
+    governance_mode: "governed"
+    determinism_tier: "d1"
+    use: "default"
+    combos:
+      - name: "default"
+        when:
+          frequency: "daily"
+        steps:
+          - step_id: "validate.schema"
+            step_type: "validate.schema"
+            version: "1"
+            params:
+              ohlcv_mode: true
+              strict: true
+          - step_id: "impute.missing"
+            step_type: "impute.missing"
+            version: "1"
+            params:
+              method: "interpolate"
+              backward_fill: true
+          - step_id: "impute.outliers"
+            step_type: "impute.outliers"
+            version: "1"
+            params:
+              method: "zscore"
+              threshold: 3.0
+          - step_id: "impute.denoise"
+            step_type: "impute.denoise"
+            version: "1"
+            params:
+              method: "ewm"
+              span: 5
+        order:
+          before:
+            validate.schema: ["impute.missing", "impute.outliers", "impute.denoise"]
+            impute.missing: ["impute.outliers", "impute.denoise"]
+            impute.outliers: ["impute.denoise"]
+  preprocessor_schema_path: py/pipeline_config/preprocessors/timeseries_gpu.yaml
+  preprocessor_preset: default
+  preprocessor_grid: small
+
+streaming:
+  batch_size: 100
+  update_interval_seconds: 60
+  buffer_size: 1000
+  max_latency_ms: 500
+  buffer_retention_seconds: 3600
+  event_triggers:
+    price_change: ">5%"
+  priority_queue: "fifo"
+  failure_recovery:
+    retry: true
+    max_attempts: 3
+  sync_interval_seconds: 300
+
+error_handling:
+  retry_policy:
+    max_attempts: 3
+    initial_backoff_seconds: 1
+    max_backoff_seconds: 60
+    retry_strategy: "exponential"
+  validation_thresholds:
+    max_missing_ratio: 0.05
+    max_outlier_ratio: 0.01
+  fallback:
+    twitter: "cache"
+    esg: "default"
+    data_source: "local"
+  alerting:
+    enabled: true
+    channel: "slack"
+    critical_failures:
+      - "data_fetch"
+    alert_severity:
+      - "high"
+  fallback_timeout_seconds: 30
+
+model:
+  model_type: "transformer"
+  architecture:
+    num_layers: 6
+    hidden_size: 512
+    dropout: 0.1
+  sequence_length: 60
+  prediction_horizon: 5
+  feature_list:
+    - "open"
+    - "high"
+    - "low"
+    - "close"
+    - "volume"
+  training_device: "gpu"
+  model_checkpoint:
+    every_n_epochs: 10
+  feature_importance:
+    method: "shap"
+  onnx_export:
+    enabled: true
+    path: "models/export.onnx"
+
+logging:
+  level: "DEBUG"
+  outputs:
+    console: true
+    file:
+      enabled: true
+      path: "logs/pipeline.log"
+      rotation: "size"
+    influxdb:
+      enabled: false
+      host: "localhost"
+      port: 8086
+      token: "${INFLUX_TOKEN}"
+      org: "marketmind"
+      bucket: "logs"
+  metrics_report_interval_seconds: 300
+  custom_metrics:
+    - "latency"
+  model_metrics:
+    - "mse"
+  metric_aggregation:
+    aggregation_window_seconds: 60
+  log_sampling_rate: 1.0
+  dashboard_config:
+    grafana_url: "http://localhost:3000"
+
+security:
+  encryption:
+    at_rest: true
+    in_transit: true
+    encryption_algorithm: "aes256"
+  key_management: "vault"
+  credentials:
+    twitter_api_key: "${TWITTER_API_KEY}"
+    esg_api_key: "${ESG_API_KEY}"
+    fred_api_key: "${FRED_API_KEY}"
+    bloomberg_api_key: "${BLOOMBERG_API_KEY}"
+    weather_api_key: "${WEATHER_API_KEY}"
+    alpha_vantage_api_key: "${ALPHA_VANTAGE_API_KEY}"
+  compliance:
+    audit_log: true
+    retention_days: 365
+    audit_frequency_days: 30
+    data_anonymization:
+      anonymize_pii: true
+
+backtesting:
+  initial_capital: 100000.0
+  transaction_cost_rate: 0.001
+  slippage_rate: 0.0005
+  strategy_list:
+    - "momentum"
+    - "stat_arb"
+  risk_management:
+    stop_loss: 0.02
+    max_drawdown: 0.1
+  date_range:
+    start: "2020-01-01"
+    end: "2025-07-30"
+  performance_metrics:
+    - "sharpe_ratio"
+    - "sortino_ratio"
+  position_sizing:
+    method: "kelly"
+  benchmark_index: "SPY"
+  backtest_frequency: "daily"
+
+distributed_processing:
+  framework: "dask"
+  num_workers: 4
+  memory_per_worker: "4GB"
+  cluster_type: "local"
+  min_rows_for_distributed: 1000
+
+alternative_data:
+  twitter:
+    base_url: "https://api.twitter.com/2/"
+    bearer_token: "${TWITTER_BEARER_TOKEN}"
+    authentication_type: "bearer"
+    endpoints:
+      search: "tweets/search/recent"
+    default_params:
+      query: "stock market"
+    rate_limit:
+      per_minute: 60
+    retry_after_header: "x-rate-limit-reset"
+    timeout_seconds: 30
+    cache_duration_hours: 1
+    data_resolution: "minute"
+    api_key: "${TWITTER_API_KEY}"
+  alpaca:
+    api_key: "${ALPACA_API_KEY}"
+    secret_key: "${ALPACA_SECRET_KEY}"
+    endpoint: "https://api.alpaca.markets"
+  esg:
+    base_url: "https://api.esg.com/"
+    api_key: "${ESG_API_KEY}"
+    authentication_type: "api_key"
+    endpoints:
+      ratings: "esg/ratings"
+    default_params:
+      symbol: "AAPL"
+    timeout_seconds: 30
+    cache_duration_hours: 24
+    data_resolution: "daily"
+  fred:
+    base_url: "https://api.stlouisfed.org/fred/"
+    api_key: "${FRED_API_KEY}"
+    authentication_type: "api_key"
+    endpoints:
+      series: "series/observations"
+    default_params:
+      series_id: "GDP"
+    rate_limit:
+      per_minute: 120
+    timeout_seconds: 10
+    cache_duration_hours: 24
+    data_resolution: "quarterly"
+  bloomberg:
+    base_url: "https://api.bloomberg.com/"
+    api_key: "${BLOOMBERG_API_KEY}"
+    authentication_type: "api_key"
+    endpoints:
+      data: "data"
+    default_params:
+      ticker: "AAPL US Equity"
+    rate_limit:
+      per_minute: 100
+    timeout_seconds: 10
+    cache_duration_hours: 24
+    data_resolution: "daily"
+  weather:
+    base_url: "https://api.weather.com/"
+    api_key: "${WEATHER_API_KEY}"
+    authentication_type: "api_key"
+    endpoints:
+      forecast: "forecast"
+    default_params:
+      location: "New York"
+    rate_limit:
+      per_minute: 50
+    timeout_seconds: 10
+    cache_duration_hours: 1
+    data_resolution: "hourly"
+
+execution:
+  concurrency:
+    per_symbol_parallelism: auto   # or an int
+    gpu_slots: 1
+  lazy: true
+  timeouts:
+    fetch_s: 120
+    clean_s: 600
+    search_s: 3600
+    preprocess_s: 900
+
+cache:
+  version_tag: v1
+  checkpoints: true
+
+
+real_time_market_data:
+  interactive_brokers:
+    host: "localhost"
+    port: 7497
+    client_id: 1
+    subscription_topics:
+      - "AAPL"
+    api_key: "${IB_API_KEY}"
+    endpoint: "tws"
+    connection_timeout_seconds: 30
+    priority: 1
+    what_to_show: "TRADES"
+    use_rth: true
+    format_date: 1
+  alpaca:
+    api_key: "${ALPACA_API_KEY}"
+    secret_key: "${ALPACA_SECRET_KEY}"
+    endpoint: "https://api.alpaca.markets"
+
+anomaly_detection:
+  enabled: true
+  method: "isolation_forest"
+  params:
+    contamination: 0.01

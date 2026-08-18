@@ -1,0 +1,66 @@
+# py/pipeline_config/preprocessors/timeseries_gpu.yaml
+presets:
+  default_transformer_preset:
+    steps:
+      - type: TechnicalFeaturesStep
+        params:
+          indicators:
+            - { name: "rsi", periods: [ 14, 28 ] }
+            - { name: "macd", fast: 12, slow: 26, signal: 9 }
+            - { name: "bollinger_bands", period: 20, std_dev: 2 }
+            - { name: "atr", period: 14 }
+          # prefer adjusted prices if available
+          price_source_cols: { open: "open", high: "high", low: "low", close: "adjusted_close", volume: "volume" }
+
+      - type: TemporalFeaturesStep
+        params:
+          features: [ "day_of_week", "month" ]   # avoid week_of_year discontinuity
+          cyclical: true                       # if your step supports this
+          timestamp_col: "date"
+
+      - type: ScalingStep
+        params:
+          method: "RobustScaler"
+          columns_to_scale:
+            - "open"
+            - "high"
+            - "low"
+            - "volume"
+            - "rsi_*"
+            - "macd_*"
+            - "bb_*"
+            - "atr_*"
+          target_col: "adjusted_close"         # not scaled
+
+      - type: SequencingStep
+        params:
+          history_len: 90
+          forecast_len: 30
+          stride: 1
+          target_col: "adjusted_close"
+          feature_cols:
+            - "open"
+            - "high"
+            - "low"
+            - "volume"
+            - "rsi_*"
+            - "macd_*"
+            - "bb_*"
+            - "atr_*"
+            - "day_*"
+            - "month"
+          group_by: [ "symbol" ]
+          sort_by: "date"
+
+  grids:
+    default_grid:
+      TechnicalFeaturesStep:
+        indicators.rsi.periods: [ [ 14 ], [ 14, 21, 28 ] ]
+        indicators.bollinger_bands.period: [ 20, 30 ]
+        indicators.bollinger_bands.std_dev: [ 2, 2.5 ]
+      ScalingStep:
+        method: [ "RobustScaler", "StandardScaler" ]
+      SequencingStep:
+        history_len: [ 60, 90, 120 ]
+        forecast_len: [ 30 ]
+        stride: [ 1, 5 ]

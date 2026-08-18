@@ -1,0 +1,19 @@
+strategy: momentum
+params:
+  short: [10, 20, 50]
+  long:  [50, 100, 200]
+  adx_min: [10, 15, 20]
+  rsi_hi: [65, 70]
+  rsi_lo: [30, 35]
+  use_ml: [false, true]
+model:
+  kind: ["rule", "xgb"]
+risk:
+  vol_target: [0.08, 0.12]
+  stop_atr: [1.5, 2.0]
+regime:
+  type: ["none", "hmm", "bocpd"]
+features:
+  backend: ["auto"]
+  sequence.length: [64]
+  scaling.type: ["standard"]

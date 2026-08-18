@@ -1,0 +1,8 @@
+# live: drift_triggers v1.0.0
+name: drift_triggers
+version: "1.0.0"
+drift_threshold: 0.05
+retrain_cooldown_seconds: 86400
+latency_budget_ms: 200
+min_samples_before_trigger: 1000
+enable_online_features: false

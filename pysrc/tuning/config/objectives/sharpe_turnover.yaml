@@ -1,0 +1,13 @@
+# objective: sharpe_turnover v1.0.0
+name: sharpe_turnover
+version: "1.0.0"
+direction: maximize
+metrics:
+  - deflated_sharpe
+  - turnover_ratio
+weights:
+  deflated_sharpe: 1.0
+  turnover_ratio: -0.5
+penalty_refs: []
+min_sharpe: 0.5
+max_turnover: 2.0

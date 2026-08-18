@@ -1,0 +1,22 @@
+# search_space: portfolio optimizer v1.0.0
+name: portfolio
+version: "1.0.0"
+model_type: mean_variance
+dimensions:
+  - name: risk_aversion
+    kind: log_real
+    low: 0.1
+    high: 100.0
+    prior: log-uniform
+  - name: turnover_penalty
+    kind: real
+    low: 0.0
+    high: 1.0
+    prior: uniform
+  - name: max_position_weight
+    kind: real
+    low: 0.05
+    high: 0.5
+    prior: uniform
+fixed:
+  covariance_estimator: ledoit_wolf

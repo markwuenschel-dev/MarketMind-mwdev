@@ -1,0 +1,8 @@
+# promotion: capped_blend v1.0.0
+name: capped_blend
+version: "1.0.0"
+mode: capped_blend
+blend_cap: 0.20
+shadow_duration_days: 5
+rollback_policy: auto
+approval_required: false

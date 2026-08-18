@@ -1,0 +1,8 @@
+# live: retrain_policy v1.0.0
+name: retrain_policy
+version: "1.0.0"
+drift_threshold: 0.08
+retrain_cooldown_seconds: 43200
+latency_budget_ms: 500
+min_samples_before_trigger: 500
+enable_online_features: true

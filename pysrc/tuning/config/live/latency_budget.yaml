@@ -1,0 +1,8 @@
+# live: latency_budget v1.0.0
+name: latency_budget
+version: "1.0.0"
+drift_threshold: 0.10
+retrain_cooldown_seconds: 3600
+latency_budget_ms: 50
+min_samples_before_trigger: 200
+enable_online_features: true

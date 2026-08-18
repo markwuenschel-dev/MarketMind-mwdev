@@ -1,0 +1,9 @@
+# validation: cpcv (combinatorial purged cross-validation) v1.0.0
+name: cpcv
+version: "1.0.0"
+method: cpcv
+n_splits: 6
+embargo_periods: 15
+crisis_holdout: true
+cost_stress_bps: 0.0
+min_train_periods: 378

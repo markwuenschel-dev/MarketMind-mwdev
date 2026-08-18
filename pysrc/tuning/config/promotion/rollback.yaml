@@ -1,0 +1,7 @@
+# promotion: rollback v1.0.0
+name: rollback
+version: "1.0.0"
+mode: shadow
+shadow_duration_days: 0
+rollback_policy: auto
+approval_required: false

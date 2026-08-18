@@ -1,0 +1,15 @@
+# objective: robustness_first v1.0.0
+name: robustness_first
+version: "1.0.0"
+direction: maximize
+metrics:
+  - deflated_sharpe
+  - pbo_score
+  - max_drawdown
+weights:
+  deflated_sharpe: 0.6
+  pbo_score: 0.3
+  max_drawdown: -0.1
+penalty_refs:
+  - crisis_underperformance
+min_sharpe: 0.3

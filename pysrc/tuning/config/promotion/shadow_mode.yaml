@@ -1,0 +1,7 @@
+# promotion: shadow_mode v1.0.0
+name: shadow_mode
+version: "1.0.0"
+mode: shadow
+shadow_duration_days: 10
+rollback_policy: auto
+approval_required: true

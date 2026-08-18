@@ -1,0 +1,9 @@
+# validation: purged_walkforward v1.0.0
+name: purged_walkforward
+version: "1.0.0"
+method: walkforward
+n_splits: 8
+embargo_periods: 20
+crisis_holdout: true
+cost_stress_bps: 0.0
+min_train_periods: 504

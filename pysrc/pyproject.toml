@@ -1,0 +1,371 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "marketmind"
+version = "0.1.0"
+description = "A modular pipeline for market data processing, cleaning, preprocessing, and backtesting."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Proprietary" }
+authors = [{ name = "Mark Wuenschel", email = "maw271190@gmail.com" }]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+  "numpy>=2.0",
+  "pandas>=2.3",
+  "pyarrow>=16.0",
+  "xgboost>=2.0",
+  "polars>=1.4",
+  "pydantic>=2.0",
+  "pyyaml>=6.0",
+  "jsonschema>=4.22",
+  "click>=8.1",
+  "opentelemetry-api>=1.20,<2.0",
+  "blake3>=0.4",
+  "xxhash>=3.4",
+  "structlog>=25.0",
+  "pandas-ta-classic>=0.5.44",
+  "scikit-learn>=1.5",
+]
+
+[project.urls]
+Homepage = "https://mindforgelabs.ai"
+Repository = "https://github.com/MindForgeLabs/MarketMind"
+Documentation = "https://marketmind.readthedocs.io"
+
+[project.scripts]
+freeze-schema = "scripts.freeze_schema:main"
+mm-gate = "pysrc.cli.gate:main"
+
+[dependency-groups]
+docs = [
+  "python-docx>=1.1",
+  "lxml>=5.0",
+]
+dev = [
+  "pytest>=8.4",
+  "pytest-cov>=6.0",
+  "pytest-xdist>=3.6",
+  "pytest-asyncio>=0.23",
+  "pytest-timeout>=2.2",
+  "hypothesis>=6.90",
+  "ruff>=0.12",
+  "mypy>=1.8",
+  "black>=24.8",
+  "pandas-stubs>=2.2",
+  "types-jsonschema>=4.22",
+  "types-PyYAML>=6.0",
+  "py>=1.11.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pysrc*", "marketmind_gate*"]
+
+
+# --- Plugin entry points (align with orchestrator) ---
+[project.entry-points."marketmind.clean_steps"]
+rename = "pysrc.pipeline.stages.market_data.transforms:ColumnRenameStep"
+cast = "pysrc.pipeline.stages.market_data.transforms:TypeCastStep"
+resample = "pysrc.pipeline.stages.market_data.joins:ResampleStep"
+multi_join = "pysrc.pipeline.stages.market_data.joins:MultiSourceJoinStep"
+anonymization = "pysrc.pipeline.stages.market_data.compliance:DataAnonymizationStep"
+regulatory_filter = "pysrc.pipeline.stages.market_data.compliance:RegulatoryFilterStep"
+MissingImputer = "pysrc.pipeline.stages.cleaning.imputers.missing:MissingImputer"
+OutlierHandler = "pysrc.pipeline.stages.cleaning.imputers.outliers:OutlierHandler"
+DenoiseNormalizerStep = "pysrc.pipeline.stages.cleaning.imputers.denoise:DenoiseNormalizerStep"
+ValidationStep = "pysrc.pipeline.stages.cleaning.validators.schema:ValidationStep"
+DriftDetectionStep = "pysrc.pipeline.stages.cleaning.validators.drift:DriftDetectionStep"
+RSIStep = "pysrc.pipeline.stages.cleaning.features.technical:RSIStep"
+MACDStep = "pysrc.pipeline.stages.cleaning.features.technical:MACDStep"
+ATRStep = "pysrc.pipeline.stages.cleaning.features.technical:ATRStep"
+
+[project.entry-points."marketmind.signals"]
+"stat_arb.spread_zscore" = "pysrc.registry.signal_catalog:create_starter_spread_zscore"
+"stat_arb.hedge_ratio" = "pysrc.registry.signal_catalog:create_starter_hedge_ratio"
+"momentum.TSMOM" = "pysrc.registry.signal_catalog:create_starter_TSMOM"
+"momentum.XSMOM" = "pysrc.registry.signal_catalog:create_starter_XSMOM"
+"RSI.baseline" = "pysrc.registry.signal_catalog:create_starter_RSI_baseline"
+
+[project.entry-points."marketmind.preproc_steps"]
+TechnicalFeaturesStep = "pysrc.pipeline.stages.preprocessing.technical_step:TechnicalFeaturesStep"
+ScalingStep = "pysrc.pipeline.stages.preprocessing.scaling_step:ScalingStep"
+TemporalStep = "pysrc.pipeline.stages.preprocessing.temporal_step:TemporalStep"
+SequenceStep = "pysrc.pipeline.stages.preprocessing.sequence_step:SequenceStep"
+SentimentESGStep = "pysrc.pipeline.stages.preprocessing.sentiment_step:SentimentESGStep"
+TextEmbeddingStep = "pysrc.pipeline.stages.preprocessing.text_embedding_step:TextEmbeddingStep"
+TopicModelingStep = "pysrc.pipeline.stages.preprocessing.topic_modeling_step:TopicModelingStep"
+ExplainabilityStep = "pysrc.pipeline.stages.preprocessing.explainability_step:ExplainabilityStep"
+IndicatorEngineStep = "pysrc.pipeline.stages.preprocessing.indicator_engine_step:IndicatorEngineStep"
+
+[project.entry-points."marketmind.capabilities"]
+# This block defines a plugin group for third-party packages to add entries.
+
+# --- Code style / QA ---
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+preview = true
+extend-exclude = '''
+(
+  ^migrations/
+  | ^build/
+  | ^dist/
+  | ^\.venv/
+  | ^\.pytest_cache/
+  | ^\.mypy_cache/
+  | ^node_modules/
+)
+'''
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = [
+  "migrations/",
+  "build/",
+  "dist/",
+  ".venv/",
+  ".pytest_cache/",
+  ".mypy_cache/",
+  "node_modules/",
+]
+fix = true   # auto-apply safe fixes on `ruff check .`
+
+[tool.ruff.lint]
+select = ["E","F","W","I","N","UP","S","B","A","C4","PT","SIM","TID","BLE"]
+ignore = []
+
+[tool.ruff.lint.isort]
+known-first-party = ["pysrc", "marketmind_gate"]
+
+# --- Using cleaned marker list from updated file ---
+[tool.pytest.ini_options]
+addopts = """
+  -q
+  -p pytest_asyncio
+  --maxfail=1
+  --strict-config
+  --strict-markers
+  --cov=py
+  --cov-branch
+  --cov-fail-under=90
+  --cov-report=term-missing:skip-covered
+  --cov-report=json
+  --timeout=60
+  --ignore=tests/python/_legacy
+  --ignore-glob=**/_legacy/**
+"""
+testpaths = ["tests/python"]
+norecursedirs = [ ".*", "build", "dist", "node_modules", ".venv", "venv", "__pycache__", "tests/python/_legacy", "_legacy", "**/_legacy" ]
+markers = [
+  "unit: focused unit tests",
+  "gpu: requires CUDA/cuDF",
+  "slow: long-running test",
+  "integration: end-to-end tests",
+  "property: property-based tests",
+  "perf: performance/benchmark tests",
+  "heavy: long/expensive tests",
+  "net: allows network",
+  "xfuture: planned feature under active development",
+  "asyncio: mark a test as an async test (requires pytest-asyncio)",
+  "robust: robust end-to-end scenarios",
+  "efficient: performance/efficiency oriented tests",
+  "combinatoric: cartesian/pairwise matrixed tests",
+  "elegant: style/architecture constraints",
+  "streaming: mark test as streaming pipeline test",
+  "benchmark: mark test as benchmark test",
+  "smoke: very fast import/basic smoke tests",
+  "regression: regression test suite",
+  "contract: data/validator contract tests",
+  "abstract: abstract/interface conformance tests",
+  "executor: execution engine tests",
+  "introspective: internal optimizer/self-probing tests",
+  "dynamic: runtime-adaptive invariant tests",
+  "determinism: d3=bitwise, d2=semantic, d1=topological, d0=none/debug only",
+  "observability_stub: structural OTel import/constant checks (no D-tier guarantee)"
+]
+filterwarnings = [
+    "ignore:datetime.datetime.utcfromtimestamp() is deprecated:DeprecationWarning:reactivex.internal.constants",
+    "ignore:style lookup by style_id is deprecated:UserWarning:docx.styles.styles",
+    "ignore:pkg_resources is deprecated as an API:UserWarning:pandas_ta",
+	  "ignore:There is no current event loop:DeprecationWarning",
+    "ignore:.*utcfromtimestamp.*:DeprecationWarning",
+    "ignore:pkg_resources is deprecated:DeprecationWarning",
+    "ignore:.*datetime\\.utcnow\\(\\) is deprecated.*:DeprecationWarning",
+]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+branch = true
+source = ["pysrc"]
+omit = [
+  # GPU-only (require CUDA, tested with @pytest.mark.gpu)
+  "pysrc/preprocessor/graph/backends/cudf.py",
+  "pysrc/preprocessor/utils/cuda_runtime.py",
+  "pysrc/preprocessor/utils/io_gpu.py",
+  "pysrc/preprocessor/utils/torch_bridge.py",
+  "pysrc/preprocessor/utils/nvtx.py",
+
+  # ML models (Phase II+, no training pipeline yet)
+  "pysrc/models/*",
+
+  # Phase II meta-learning package (omit legacy / scaffold modules; MLC-1 encoder surfaces are measured)
+  "pysrc/meta_learning/__init__.py",
+  "pysrc/meta_learning/confidence_contract.py",
+  "pysrc/meta_learning/contracts/__init__.py",
+  "pysrc/meta_learning/contracts/encoder_contracts.py",
+  "pysrc/meta_learning/contracts/meta_task.py",
+  "pysrc/meta_learning/contracts/task_registry.py",
+  "pysrc/meta_learning/dynamic_k_contract.py",
+  "pysrc/meta_learning/inference_boundary.py",
+  "pysrc/meta_learning/in_memory_task_registry.py",
+  "pysrc/meta_learning/phase2_ii0c_comparison.py",
+  "pysrc/meta_learning/phase2_ii0c_encoder.py",
+  "pysrc/meta_learning/phase2_ii0c_reference.py",
+  "pysrc/meta_learning/phase2_ii0c_tasks.py",
+  "pysrc/meta_learning/regime_vocabulary.py",
+  "pysrc/meta_learning/task_generator.py",
+
+  # Phase III+ surfaces outside the built Phase I scope
+  "pysrc/tuning/*",
+  "pysrc/utils/dataset_builders.py",
+  "pysrc/utils/holidays.py",
+  "pysrc/utils/logger.py",
+  "pysrc/utils/hparam_search.py",
+
+  # Generic pipeline branches outside the governed Phase I path
+  "pysrc/pipeline/stages/cleaning/features/*",
+  "pysrc/pipeline/stages/cleaning/execution/*",
+  "pysrc/pipeline/stages/cleaning/validators/drift.py",
+  "pysrc/pipeline/stages/cleaning/validators/io.py",
+  "pysrc/pipeline/stages/cleaning/validators/stream.py",
+  "pysrc/pipeline/stages/cleaning/imputers/denoise.py",
+  "pysrc/pipeline/stages/cleaning/imputers/outliers.py",
+  "pysrc/pipeline/stages/cleaning/core/metrics.py",
+  "pysrc/pipeline/stages/preprocessing/*",
+  "pysrc/pipeline/stages/market_data/compliance.py",
+  "pysrc/pipeline/stages/market_data/joins.py",
+  "pysrc/pipeline/stages/market_data/transforms.py",
+
+  # Deferred strategy branches outside the live Phase I slices
+  "pysrc/strategies/momentum/plans/industry.py",   # Phase II
+  "pysrc/strategies/momentum/plans/ensemble.py",   # Phase II/III
+  "pysrc/strategies/momentum/plans/ml.py",         # Phase III
+  "pysrc/strategies/momentum/control/__init__.py", # Phase III
+  "pysrc/strategies/stat_arb/artifacts/signal_card.py",
+  "pysrc/strategies/stat_arb/artifacts/schemas.py",
+  "pysrc/strategies/stat_arb/formation.py",
+  "pysrc/strategies/stat_arb/signal_ops.py",
+  "pysrc/strategies/stat_arb/risk_gates.py",
+  "pysrc/strategies/stat_arb/validators.py",
+  "pysrc/strategies/stat_arb/dimensions/base.py",
+  "pysrc/strategies/stat_arb/dimensions/pairs.py",
+  "pysrc/strategies/stat_arb/dimensions/triplets.py",
+  "pysrc/strategies/stat_arb/dimensions/quadruplets.py",
+  "pysrc/strategies/stat_arb/dimensions/quintuplets.py",
+  "pysrc/strategies/stat_arb/dimensions/sextuplets.py",
+  "pysrc/strategies/stat_arb/dimensions/heptuplets.py",
+  "pysrc/strategies/stat_arb/control/controller.py",
+  "pysrc/strategies/stat_arb/control/multi_ou.py",
+  "pysrc/strategies/stat_arb/control/riccati.py",
+  "pysrc/strategies/stat_arb/control/xi_solver.py",
+  "pysrc/strategies/stat_arb/control/stability.py",
+
+  # Broker / infra (Phase III)
+  "pysrc/infra/brokers/*",
+]
+
+[tool.coverage.report]
+# coverage.py exposes one fail_under threshold here; CI enforces the branch floor from coverage.json.
+fail_under = 90
+show_missing = true
+skip_covered = true
+precision = 1
+
+[tool.coverage.paths]
+pysrc = ["pysrc", "*/site-packages/pysrc"]
+
+# --- mypy configuration ---
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = "marketmind_gate.*"
+strict = true
+
+[[tool.mypy.overrides]]
+module = [
+    "fastapi.*",
+    "lightgbm.*",
+    "ruamel.*",
+    "sklearn.*",
+    "structlog.*",
+    "xgboost.*",
+]
+ignore_missing_imports = true
+
+# OI-33 bleed — transitive imports outside the I-F canonical mypy surface.
+# Each entry below suppresses errors pulled in from modules not named in GATE-I-F-02.
+# The canonical surface (momentum/, pipeline_strategy.py, artifact_registry/, cli/gate.py)
+# remains fully checked.
+[[tool.mypy.overrides]]
+module = "pysrc.preprocessor.*"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "pysrc.ops.*"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "pysrc.registry.*"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "pysrc.backtesting.*"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "pysrc.data.*"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "pysrc.pipeline.*"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "pysrc.utils.*"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = [
+    "pysrc.meta.anti_signal_autopsy",
+    "pysrc.meta.w1_clean_rerun",
+    "pysrc.meta.w1_ranking_vs_expression_decomposition",
+    "pysrc.meta.w2_s1_baseline_only",
+    "pysrc.autotune.*",
+    "pysrc.domain.interfaces",
+    "pysrc.infra.*",
+    "pysrc.models.*",
+    "pysrc.strategies.adaptive_strategy_engine",
+    "pysrc.strategies.migrated_strategies",
+    "pysrc.strategies.momentum.comparison",
+    "pysrc.strategies.stat_arb.pairs",
+]
+ignore_errors = true
+

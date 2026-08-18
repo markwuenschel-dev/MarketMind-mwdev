@@ -1,0 +1,9 @@
+# validation: cost_stress v1.0.0
+name: cost_stress
+version: "1.0.0"
+method: purged_cv
+n_splits: 5
+embargo_periods: 10
+crisis_holdout: false
+cost_stress_bps: 20.0
+min_train_periods: 252
