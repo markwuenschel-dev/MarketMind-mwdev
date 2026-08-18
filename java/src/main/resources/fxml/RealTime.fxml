@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<VBox xmlns:fx="http://javafx.com/fxml" alignment="CENTER"
+  spacing="10" xmlns="http://javafx.com/javafx"
+  fx:controller="com.marketmind.features.realtime.RealTimeController">
+  <Label text="Real-Time Data" fx:id="realTimeLabel"/>
+  <Label text="Ticker: N/A" fx:id="tickerLabel"/>
+  <Label text="Price: N/A" fx:id="priceLabel"/>
+  <LineChart fx:id="priceChart">
+    <xAxis>
+      <CategoryAxis label="Timestamp"/>
+    </xAxis>
+    <yAxis>
+      <NumberAxis label="Price"/>
+    </yAxis>
+  </LineChart>
+</VBox>
+

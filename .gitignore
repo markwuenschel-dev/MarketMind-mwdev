@@ -1,2 +1,227 @@
-*.pyc
-/pysrc/.idea
+# === General OS Files ===
+.DS_Store
+Thumbs.db
+desktop.ini
+*.lnk
+
+# Third-party libraries
+patchedLibs/
+
+# === Office temp/lock files ===
+~$*.docx
+~$*.pptx
+~$*.xlsx
+
+# === IDEs and Editors ===
+.vscode/
+.idea/
+*.iws
+*.iml
+*.ipr
+.spyproject/
+cmake-build-*/
+*.swp
+*.swo
+*.bak
+
+# === Visual Studio ===
+.vs/
+*.vcxproj.user
+*.VC.db
+*.VC.opendb
+*.VC.db-shm
+*.VC.db-wal
+*.vsidx
+*.wsuo
+*.suo
+*.user
+*.userosscache
+
+# === CMake ===
+build/
+CMakeFiles/
+CMakeCache.txt
+cmake-build-*/
+
+# === VSCode ===
+.vscode/
+
+# === STS ===
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# Oversized archived run outputs (keep local only; exceeds GitHub 100MB limit)
+archive/artifacts/phase_ii/w2_runs/w2_s1_baseline_only/w2_opportunity_manifest.json
+
+# === Python ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+.eggs/
+venv/
+env/
+ENV/
+*.env
+.env
+*.venv/
+.pip-cache/
+.mypy_cache/
+.pytest_cache/
+.coverage
+coverage.xml
+coverage.json
+.tox/
+*.cover
+test-results/
+.ipynb_checkpoints
+
+# === ML Models and Data ===
+/data/processed/*
+!/data/processed/.gitkeep
+/data/raw/*
+!/data/raw/.gitkeep
+/models/*
+!/models/.gitkeep
+*.onnx
+*.h5
+*.pkl
+*.joblib
+*.pt
+*.pth
+/checkpoints/*
+!/checkpoints/.gitkeep
+
+# === C++ ===
+*.o
+*.obj
+*.exe
+*.out
+*.a
+*.so
+*.dll
+*.pdb
+*.lib
+cpp/.vs/
+cpp/out/
+/build/
+/cmake-build-debug/
+/cmake-build-release/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# === Docs build outputs ===
+docs/out/
+docs/docmodel/_tmp/
+
+# === Java ===
+*.class
+*.jar
+*.war
+*.ear
+/target/
+.classpath
+.project
+.settings/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# === Deployment ===
+docker-compose.override.yml
+deployment/*.log
+deployment/*.bak
+deployment/.env
+*.kube
+
+# === Logs and Databases ===
+*.log
+*.log.*
+*.sqlite
+*.sqlite3
+*.db
+
+# === Sensitive Files ===
+*.pem
+*.key
+*.cer
+*.crt
+*.csr
+*.der
+*.p12
+*.pfx
+*.rsa
+*.pub
+*.gpg
+*.pgp
+credentials.json
+*.secret
+
+# === gRPC (if used) ===
+*_pb2.py
+*_pb2_grpc.py
+
+# === Hypothesis (property-based test) artifacts ===
+.hypothesis/
+
+# === AI coding assistants ===
+.claude/
+.codex/
+.codex_pydeps/
+.tmp_codex*
+.cursor/
+.gemini/
+.agent/
+.agents/
+skills-lock.json
+
+# === Local Python version pin (pyenv/uv; not repo policy) ===
+.python-version
+
+# === Local tooling / CI artifacts ===
+.poetry-cache/
+gate_result.json
+.docstub_cache.json
+.test_intelligence/
+.tmp/
+
+# === Miscellaneous ===
+*.tmp
+*.cache
+*.csv~
+*.json~
+
+node_modules/
+/.codex_hypothesis
+.tmp_plan_416_check.ps1
+*.parquet
+*.csv
+/artifacts
+/fixtures
+/data/massive
+/.tmp_exec_assumptions
+/.tmp_exec_assumptions_smoke
+/.tmp_exec_assumptions
+
+# === MarketMind run outputs (research cleanup) ===
+artifacts/scratch/
+artifacts/runs/*
+!artifacts/runs/.gitkeep
+docs/docmodel/generated/
+archive/research_lanes/**/runs/
+runs/
+
+# pysrc/artifacts is Python package only (no committed data trees)
+pysrc/artifacts/*
+!pysrc/artifacts/__init__.py
+!pysrc/artifacts/run_layout.py
+!pysrc/artifacts/lane_paths.py

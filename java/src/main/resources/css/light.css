@@ -1,0 +1,52 @@
+/* Light theme variables */
+.root {
+  --background-color: #ffffff;
+  --text-color: #000000;
+  --accent-color: #007bff;
+  --button-text-color: #ffffff;
+  --input-bg-color: #f0f0f0;
+  --border-color: #ccc;
+}
+
+/* Apply background to the root pane */
+.root {
+  -fx-background-color: var(--background-color);
+}
+
+/* Text elements */
+.label, .text {
+  -fx-text-fill: var(--text-color);
+}
+
+/* Hyperlinks */
+.hyperlink {
+  -fx-text-fill: var(--accent-color);
+}
+
+/* Buttons */
+.button {
+  -fx-background-color: var(--accent-color);
+  -fx-text-fill: var(--button-text-color);
+  -fx-border-radius: 5px;
+  -fx-padding: 10px 20px;
+  -fx-cursor: hand;
+}
+
+.button:hover {
+  -fx-opacity: 0.8;
+}
+
+/* Input fields */
+.text-field, .text-area {
+  -fx-background-color: var(--input-bg-color);
+  -fx-text-fill: var(--text-color);
+  -fx-border-color: var(--border-color);
+  -fx-border-width: 1px;
+  -fx-padding: 5px;
+}
+
+/* Focus styles for accessibility */
+.button:focused, .text-field:focused, .text-area:focused {
+  -fx-border-color: var(--accent-color);
+  -fx-border-width: 2px;
+}

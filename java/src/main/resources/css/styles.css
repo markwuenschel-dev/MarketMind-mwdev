@@ -1,0 +1,134 @@
+/*
+ * MarketMind Shared Styles
+ * Defines global styles applied across all components for consistency.
+ * These styles can be overridden by theme-specific CSS files (e.g., light.css, dark.css).
+ */
+.root {
+  -fx-font-family: "Roboto", sans-serif; /* Modern, professional font */
+  -fx-font-size: 14px;
+  -fx-background-color: #f0f0f0; /* Neutral background for light theme */
+  -fx-text-fill: #333333; /* Dark text for sufficient contrast */
+  -fx-padding: 10px;
+  -fx-focus-color: #4CAF50; /* Consistent focus color across components */
+}
+
+/*
+ * Shared Button Styles
+ * Default button styles to ensure consistency across the application.
+ * Can be overridden in component-specific sections if needed.
+ */
+.button {
+  -fx-background-color: #4CAF50; /* Green background for primary actions */
+  -fx-text-fill: white;
+  -fx-background-radius: 5px;
+  -fx-font-weight: bold;
+}
+
+.button:hover {
+  -fx-background-color: #45a049; /* Slightly darker on hover */
+  -fx-scale-x: 1.05;
+  -fx-scale-y: 1.05;
+  -fx-cursor: hand; /* Indicates clickable element */
+}
+
+/*
+ * Dashboard Component Styles
+ * Specific styles for the dashboard view, including charts and tables.
+ */
+.dashboard .chart {
+  -fx-background-color: #ffffff;
+  -fx-border-color: #dddddd;
+  -fx-border-width: 1px;
+  -fx-padding: 5px;
+}
+
+.dashboard .table-view {
+  -fx-background-color: #fafafa;
+  -fx-border-color: #dddddd;
+  -fx-border-width: 1px;
+}
+
+.dashboard .table-view .column-header {
+  -fx-background-color: #e0e0e0;
+  -fx-font-weight: bold;
+}
+
+/*
+ * Login Component Styles
+ * Styles for login form elements to ensure a clean, user-friendly interface.
+ */
+.login .text-field {
+  -fx-background-color: #ffffff;
+  -fx-border-color: #cccccc;
+  -fx-border-radius: 5px;
+  -fx-padding: 5px;
+}
+
+.login .text-field:focused {
+  -fx-border-color: #4CAF50;
+  -fx-border-width: 2px;
+}
+
+.login .password-field {
+  -fx-background-color: #ffffff;
+  -fx-border-color: #cccccc;
+  -fx-border-radius: 5px;
+  -fx-padding: 5px;
+}
+
+.login .password-field:focused {
+  -fx-border-color: #4CAF50;
+  -fx-border-width: 2px;
+}
+
+/*
+ * Real-Time Component Styles
+ * Styles for real-time data visualizations and progress indicators.
+ */
+.realtime .chart {
+  -fx-background-color: #ffffff;
+  -fx-border-color: #dddddd;
+  -fx-border-width: 1px;
+}
+
+.realtime .progress-bar > .bar {
+  -fx-background-color: #2196F3; /* Blue for progress indication */
+}
+
+.realtime .progress-bar {
+  -fx-background-color: #e0e0e0;
+  -fx-padding: 2px;
+}
+
+/*
+ * Settings Component Styles
+ * Styles for settings view, ensuring clarity and usability.
+ */
+.settings .label {
+  -fx-font-weight: bold;
+  -fx-text-fill: #333333;
+}
+
+.settings .choice-box {
+  -fx-background-color: #ffffff;
+  -fx-border-color: #cccccc;
+  -fx-border-radius: 5px;
+}
+
+.settings .choice-box .label {
+  -fx-text-fill: #333333;
+}
+
+.settings .choice-box:hover {
+  -fx-background-color: #f0f0f0;
+}
+
+/*
+ * Accessibility Enhancements
+ * Styles to improve accessibility, such as focus indicators and high-contrast elements.
+ */
+*:focused {
+  -fx-border-color: #4CAF50;
+  -fx-border-width: 2px;
+  -fx-border-style: solid;
+}

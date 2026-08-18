@@ -1,0 +1,33 @@
+<configuration>
+  <!-- Include Spring Boot's default logging configuration -->
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE">
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+    <file>logs/marketmind.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>logs/marketmind.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>30</maxHistory> <!-- Retain logs for 30 days -->
+    </rollingPolicy>
+  </appender>
+
+  <!-- Console appender for development and general use -->
+  <appender class="ch.qos.logback.classic.AsyncAppender" name="ASYNC_FILE">
+    <appender-ref ref="FILE"/>
+  </appender>
+
+  <!-- File appender with daily rotation -->
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+  <!-- Asynchronous file logging to prevent blocking -->
+  <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+  <!-- Root logger configuration -->
+  <logger level="DEBUG" name="com.marketmind"/>
+
+  <!-- Optional: Set specific logging levels for packages or classes -->
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="ASYNC_FILE"/>
+  </root>
+</configuration>

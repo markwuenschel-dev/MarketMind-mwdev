@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.layout.VBox?>
+<VBox xmlns:fx="http://javafx.com/fxml" alignment="CENTER"
+  spacing="10" xmlns="http://javafx.com/javafx"
+  fx:controller="com.marketmind.features.settings.SettingsController">
+  <Button onAction="#handleSave" text="Save" fx:id="saveButton"/>
+  <CheckBox text="Enable Notifications" fx:id="notificationsCheckBox"/>
+  <ComboBox promptText="Select Theme" fx:id="themeComboBox"/>
+  <Label text="Application Settings"/>
+  <Slider max="60" min="1" value="10" fx:id="refreshRateSlider"/>
+</VBox>

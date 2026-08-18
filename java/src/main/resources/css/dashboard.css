@@ -1,0 +1,101 @@
+.root {
+  -fx-background-color: #1E1E1E; /* Dark mode background */
+}
+
+.sidebar {
+  -fx-background-color: #2A2A2A;
+  -fx-border-color: #3A3A3A;
+  -fx-border-width: 0 1 0 0;
+}
+
+.sidebar-title {
+  -fx-font-family: "Roboto";
+  -fx-font-size: 18px;
+  -fx-font-weight: bold;
+  -fx-text-fill: #FFFFFF;
+  -fx-padding: 10;
+}
+
+.nav-button {
+  -fx-background-color: transparent;
+  -fx-text-fill: #E0E0E0;
+  -fx-font-family: "Roboto";
+  -fx-font-size: 14px;
+  -fx-alignment: center-left;
+  -fx-padding: 5 10;
+}
+
+.nav-button:hover {
+  -fx-background-color: #007BFF;
+  -fx-text-fill: #FFFFFF;
+}
+
+.nav-button .ikonli-font-icon {
+  -fx-icon-color: #E0E0E0; /* Light gray to match sidebar text */
+  -fx-icon-size: 16px;
+}
+
+.nav-button:hover .ikonli-font-icon {
+  -fx-icon-color: #FFFFFF; /* White on hover to match text */
+}
+
+.stat-label {
+  -fx-font-family: "Roboto";
+  -fx-font-size: 12px;
+  -fx-text-fill: #E0E0E0;
+  -fx-padding: 5;
+}
+
+.main-grid {
+  -fx-background-color: #1E1E1E;
+}
+
+.card {
+  -fx-background-color: #2A2A2A;
+  -fx-background-radius: 5;
+  -fx-border-radius: 5;
+  -fx-padding: 10;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 2);
+}
+
+.card-title {
+  -fx-font-family: "Roboto";
+  -fx-font-size: 16px;
+  -fx-font-weight: bold;
+  -fx-text-fill: #FFFFFF;
+}
+
+.card-value {
+  -fx-font-family: "Roboto";
+  -fx-font-size: 14px;
+  -fx-text-fill: #E0E0E0;
+}
+
+.card-change-positive {
+  -fx-font-family: "Roboto";
+  -fx-font-size: 12px;
+  -fx-text-fill: #28A745;
+}
+
+.card-change-negative {
+  -fx-font-family: "Roboto";
+  -fx-font-size: 12px;
+  -fx-text-fill: #DC3545;
+}
+
+.chart {
+  -fx-background-color: #2A2A2A;
+  -fx-background-radius: 5;
+}
+
+.chart-plot-background {
+  -fx-background-color: #2A2A2A;
+}
+
+.axis {
+  -fx-tick-label-fill: #E0E0E0;
+}
+
+.chart-series-line {
+  -fx-stroke: #007BFF;
+}

@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2200" height="1300" viewBox="0 0 2200 1300">
+  <defs>
+    <linearGradient id="gradBlueMain" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#c9daf8" stop-opacity=".95"/>
+      <stop offset="100%" stop-color="#8ec5fc" stop-opacity=".95"/>
+    </linearGradient>
+    <linearGradient id="gradGreenMain" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e2f0d9" stop-opacity=".95"/>
+      <stop offset="100%" stop-color="#a7d28d" stop-opacity=".95"/>
+    </linearGradient>
+    <linearGradient id="gradOrangeMain" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fce5cd" stop-opacity=".95"/>
+      <stop offset="100%" stop-color="#f6b26b" stop-opacity=".95"/>
+    </linearGradient>
+    <linearGradient id="pillBlue" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#fff" stop-opacity=".92"/>
+      <stop offset="100%" stop-color="#c9daf8" stop-opacity=".88"/>
+    </linearGradient>
+    <linearGradient id="pillGreen" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#fff" stop-opacity=".92"/>
+      <stop offset="100%" stop-color="#e2f0d9" stop-opacity=".9"/>
+    </linearGradient>
+    <linearGradient id="pillOrange" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#fff" stop-opacity=".92"/>
+      <stop offset="100%" stop-color="#fce5cd" stop-opacity=".9"/>
+    </linearGradient>
+    <radialGradient id="regFill" cx="35%" cy="35%" r="75%">
+      <stop offset="0%" stop-color="#fff" stop-opacity=".92"/>
+      <stop offset="100%" stop-color="#e2f0d9" stop-opacity=".96"/>
+    </radialGradient>
+    <marker id="arrow" markerWidth="14" markerHeight="14" refX="12" refY="7" orient="auto" markerUnits="strokeWidth">
+      <path d="m0 0 14 7-14 7Z" fill="#6a77c5"/>
+    </marker>
+    <filter id="shadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4.5" flood-color="#000" flood-opacity=".14"/>
+    </filter>
+  </defs>
+  <style>
+    .subtitle{font-family:&quot;Helvetica Neue&quot;,Roboto,Arial,sans-serif;font-size:16px;fill:#204060;opacity:.86}.groupBox{stroke:#6f7f91;stroke-width:1.8;fill-opacity:1}.groupTitle{font-family:&quot;Helvetica Neue&quot;,Roboto,Arial,sans-serif;font-size:20px;font-weight:700;fill:#204060}.module{stroke:#6f7f91;stroke-width:1.8;filter:url(#shadow)}.modSub,.modTitle{font-family:&quot;Helvetica Neue&quot;,Roboto,Arial,sans-serif;fill:#204060}.modTitle{font-size:18px;font-weight:700}.modSub{font-size:14px;opacity:.9}.pill{stroke:rgba(111,127,145,.62);stroke-width:1.2}.pillText{font-family:&quot;Helvetica Neue&quot;,Roboto,Arial,sans-serif;font-size:14px;fill:#204060}.arrow{stroke:#6a77c5;stroke-width:2.6;fill:none;marker-end:url(#arrow);stroke-linecap:round;stroke-linejoin:round}.arrowLabel{font-family:&quot;Helvetica Neue&quot;,Roboto,Arial,sans-serif;font-size:14px;fill:#204060}.labelBg{fill:#fff;opacity:.92;stroke:rgba(111,127,145,.3);stroke-width:1}.token{stroke:rgba(111,127,145,.45);stroke-width:1.2;filter:url(#shadow)}.legendText{font-family:&quot;Helvetica Neue&quot;,Roboto,Arial,sans-serif;font-size:14px;fill:#204060}.legendSwatch{stroke:rgba(111,127,145,.7);stroke-width:1.2}
+  </style>
+  <text x="1100" y="86" text-anchor="middle" style="font-family:&quot;Helvetica Neue&quot;,Roboto,Arial,sans-serif;font-size:30px;font-weight:700;fill:#204060;letter-spacing:.2px">MarketMind Platform Architecture</text>
+  <text class="subtitle" x="1100" y="122" text-anchor="middle">Data ingestion → feature/pipeline orchestration → ultra-low-latency inference → client UX &amp; APIs</text>
+  <rect class="groupBox" x="80" y="190" width="560" height="820" rx="28" ry="28" fill="#eef5ff"/>
+  <text class="groupTitle" x="118" y="234">Data Sources &amp; Storage</text>
+  <text class="subtitle" x="118" y="264">Feeds, persistence, and feature history</text>
+  <rect class="groupBox" x="700" y="170" width="960" height="840" rx="28" ry="28" fill="#eef8ee"/>
+  <text class="groupTitle" x="740" y="214">Core ML &amp; Inference Engine</text>
+  <text class="subtitle" x="740" y="244">Registry-driven pipelines, serving, accelerated kernels</text>
+  <rect class="groupBox" x="1700" y="190" width="480" height="820" rx="28" ry="28" fill="#fff3ea"/>
+  <text class="groupTitle" x="1740" y="234">Client Applications</text>
+  <text class="subtitle" x="1740" y="264">Desktop UX &amp; local APIs</text>
+  <rect class="module" x="120" y="310" width="480" height="280" rx="20" ry="20" fill="url(#gradBlueMain)"/>
+  <text class="modTitle" x="155" y="356">Market Data Sources</text>
+  <text class="modSub" x="155" y="384">yfinance · FRED · live feeds</text>
+  <rect class="pill" x="155" y="412" width="410" height="38" rx="19" ry="19" fill="url(#pillBlue)"/>
+  <text class="pillText" x="360" y="437" text-anchor="middle">tick normalization + schema</text>
+  <rect class="pill" x="155" y="458" width="410" height="38" rx="19" ry="19" fill="url(#pillBlue)"/>
+  <text class="pillText" x="360" y="483" text-anchor="middle">raw → derived feature seeds</text>
+  <rect class="pill" x="155" y="504" width="410" height="38" rx="19" ry="19" fill="url(#pillBlue)"/>
+  <text class="pillText" x="360" y="529" text-anchor="middle">quality checks + sampling</text>
+  <rect class="module" x="120" y="650" width="480" height="320" rx="20" ry="20" fill="url(#gradBlueMain)"/>
+  <text class="modTitle" x="155" y="696">Storage &amp; Time-series DB</text>
+  <text class="modSub" x="155" y="724">InfluxDB / local cache</text>
+  <rect class="pill" x="155" y="752" width="410" height="38" rx="19" ry="19" fill="url(#pillBlue)"/>
+  <text class="pillText" x="360" y="777" text-anchor="middle">historical ticks, bars, OHLCV</text>
+  <rect class="pill" x="155" y="798" width="410" height="38" rx="19" ry="19" fill="url(#pillBlue)"/>
+  <text class="pillText" x="360" y="823" text-anchor="middle">feature cache + snapshots</text>
+  <rect class="pill" x="155" y="844" width="410" height="38" rx="19" ry="19" fill="url(#pillBlue)"/>
+  <text class="pillText" x="360" y="869" text-anchor="middle">replay + backfill support</text>
+  <rect class="module" x="750" y="310" width="420" height="280" rx="20" ry="20" fill="url(#gradGreenMain)"/>
+  <text class="modTitle" x="785" y="356">Python Orchestrator</text>
+  <text class="modSub" x="785" y="384">Pipelines &amp; engines</text>
+  <rect class="pill" x="785" y="412" width="350" height="38" rx="19" ry="19" fill="url(#pillGreen)"/>
+  <text class="pillText" x="960" y="437" text-anchor="middle">ingest + feature build</text>
+  <rect class="pill" x="785" y="458" width="350" height="38" rx="19" ry="19" fill="url(#pillGreen)"/>
+  <text class="pillText" x="960" y="483" text-anchor="middle">strategy + risk checks</text>
+  <rect class="pill" x="785" y="504" width="350" height="38" rx="19" ry="19" fill="url(#pillGreen)"/>
+  <text class="pillText" x="960" y="529" text-anchor="middle">pipeline composition (registry)</text>
+  <rect class="pill" x="785" y="550" width="350" height="38" rx="19" ry="19" fill="url(#pillGreen)"/>
+  <text class="pillText" x="960" y="575" text-anchor="middle">metrics + tracing hooks</text>
+  <rect class="module" x="1210" y="310" width="420" height="280" rx="20" ry="20" fill="url(#gradGreenMain)"/>
+  <text class="modTitle" x="1245" y="356">C++ Inference Backend</text>
+  <text class="modSub" x="1245" y="384">Ultra-low-latency serving</text>
+  <rect class="pill" x="1245" y="412" width="350" height="38" rx="19" ry="19" fill="url(#pillGreen)"/>
+  <text class="pillText" x="1420" y="437" text-anchor="middle">model routing (ONNX)</text>
+  <rect class="pill" x="1245" y="458" width="350" height="38" rx="19" ry="19" fill="url(#pillGreen)"/>
+  <text class="pillText" x="1420" y="483" text-anchor="middle">JNI / gRPC bridge</text>
+  <rect class="pill" x="1245" y="504" width="350" height="38" rx="19" ry="19" fill="url(#pillGreen)"/>
+  <text class="pillText" x="1420" y="529" text-anchor="middle">batching + backpressure</text>
+  <rect class="pill" x="1245" y="550" width="350" height="38" rx="19" ry="19" fill="url(#pillGreen)"/>
+  <text class="pillText" x="1420" y="575" text-anchor="middle">latency metrics &amp; guards</text>
+  <rect class="module" x="1210" y="700" width="420" height="270" rx="20" ry="20" fill="url(#gradGreenMain)"/>
+  <text class="modTitle" x="1245" y="746">GPU/CPU Compute Stack</text>
+  <text class="modSub" x="1245" y="774">cuDF · CuPy · Torch · TensorRT</text>
+  <rect class="pill" x="1245" y="802" width="350" height="38" rx="19" ry="19" fill="url(#pillGreen)"/>
+  <text class="pillText" x="1420" y="827" text-anchor="middle">tensor kernels (GPU)</text>
+  <rect class="pill" x="1245" y="848" width="350" height="38" rx="19" ry="19" fill="url(#pillGreen)"/>
+  <text class="pillText" x="1420" y="873" text-anchor="middle">CPU fallback (Polars)</text>
+  <rect class="pill" x="1245" y="894" width="350" height="38" rx="19" ry="19" fill="url(#pillGreen)"/>
+  <text class="pillText" x="1420" y="919" text-anchor="middle">vectorized feature ops</text>
+  <circle class="token" cx="1180" cy="640" r="30" fill="url(#regFill)"/>
+  <text class="pillText" x="1180" y="646" text-anchor="middle" font-size="15">R</text>
+  <text class="subtitle" x="1218" y="632">Registry</text>
+  <text class="subtitle" x="1218" y="656">plugins</text>
+  <rect class="module" x="1740" y="310" width="420" height="310" rx="20" ry="20" fill="url(#gradOrangeMain)"/>
+  <text x="1775" y="356">
+    <tspan class="modTitle" x="1775" dy="0">JavaFX UI &amp;</tspan>
+    <tspan class="modTitle" x="1775" dy="24">Spring Services</tspan>
+  </text>
+  <text class="modSub" x="1775" y="410">Desktop client + local APIs</text>
+  <rect class="pill" x="1775" y="438" width="350" height="38" rx="19" ry="19" fill="url(#pillOrange)"/>
+  <text class="pillText" x="1950" y="463" text-anchor="middle">dashboards + charting</text>
+  <rect class="pill" x="1775" y="484" width="350" height="38" rx="19" ry="19" fill="url(#pillOrange)"/>
+  <text class="pillText" x="1950" y="509" text-anchor="middle">alerts + signal review</text>
+  <rect class="pill" x="1775" y="530" width="350" height="38" rx="19" ry="19" fill="url(#pillOrange)"/>
+  <text class="pillText" x="1950" y="555" text-anchor="middle">local endpoints (REST)</text>
+  <rect class="pill" x="1775" y="576" width="350" height="38" rx="19" ry="19" fill="url(#pillOrange)"/>
+  <text class="pillText" x="1950" y="601" text-anchor="middle">session + audit logs</text>
+  <path class="arrow" d="M600 450h150"/>
+  <rect class="labelBg" x="636" y="404" width="178" height="32" rx="12" ry="12"/>
+  <text class="arrowLabel" x="725" y="426" text-anchor="middle">ticks / features</text>
+  <path class="arrow" d="M1170 450h40"/>
+  <rect class="labelBg" x="1090" y="404" width="180" height="29" rx="12" ry="12"/>
+  <text class="arrowLabel" x="1190" y="426" text-anchor="middle">gRPC / JNI calls</text>
+  <path class="arrow" d="M1630 450h110"/>
+  <rect class="labelBg" x="1600" y="404" width="210" height="32" rx="12" ry="12"/>
+  <text class="arrowLabel" x="1707" y="426" text-anchor="middle">predictions / signals</text>
+  <circle class="token" cx="660" cy="450" r="9" fill="url(#pillBlue)"/>
+  <circle class="token" cx="688" cy="450" r="9" fill="url(#pillBlue)"/>
+  <circle class="token" cx="1110" cy="450" r="9" fill="url(#pillGreen)"/>
+  <circle class="token" cx="1138" cy="450" r="9" fill="url(#pillGreen)"/>
+  <circle class="token" cx="1680" cy="450" r="9" fill="url(#pillOrange)"/>
+  <circle class="token" cx="1708" cy="450" r="9" fill="url(#pillOrange)"/>
+  <path class="arrow" d="M600 780c140-95 220-145 330-190"/>
+  <rect class="labelBg" x="700" y="650" width="260" height="32" rx="12" ry="12"/>
+  <text class="arrowLabel" x="830" y="672" text-anchor="middle">historical data / features</text>
+  <path class="arrow" d="M930 590C820 700 740 785 600 860"/>
+  <rect class="labelBg" x="710" y="790" width="210" height="32" rx="12" ry="12"/>
+  <text class="arrowLabel" x="815" y="812" text-anchor="middle">cache / snapshots</text>
+  <path class="arrow" d="M1110 590q45 37.5 60 45"/>
+  <rect class="labelBg" x="990" y="666" width="230" height="32" rx="12" ry="12"/>
+  <text class="arrowLabel" x="1105" y="688" text-anchor="middle">pipeline composition</text>
+  <path class="arrow" d="M1210 640c80-12 150-30 180-50"/>
+  <rect class="labelBg" x="1245" y="664" width="210" height="32" rx="12" ry="12"/>
+  <text class="arrowLabel" x="1350" y="686" text-anchor="middle">backend selection</text>
+  <path class="arrow" d="M1420 700c230-25 230-85 0-110"/>
+  <rect class="labelBg" x="1540" y="630" width="140" height="32" rx="12" ry="12"/>
+  <text class="arrowLabel" x="1610" y="652" text-anchor="middle">tensor ops</text>
+  <path d="M1630 520c50 40 80 80 110 120" style="stroke:#6a77c5;stroke-width:2.2;fill:none;marker-end:url(#arrow);stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:8 8;opacity:.85"/>
+  <rect class="labelBg" x="1710" y="632" width="210" height="32" rx="12" ry="12"/>
+  <text class="arrowLabel" x="1815" y="654" text-anchor="middle">latency + confidence</text>
+  <rect x="80" y="1070" width="1130" height="180" rx="26" ry="26" fill="#fff" opacity=".88" stroke="rgba(111,127,145,0.55)" stroke-width="1.4"/>
+  <text class="groupTitle" x="120" y="1112">Legend</text>
+  <rect class="legendSwatch" x="120" y="1130" width="76" height="40" rx="14" ry="14" fill="url(#gradBlueMain)"/>
+  <text class="legendText" x="214" y="1156">Data modules</text>
+  <rect class="legendSwatch" x="420" y="1130" width="76" height="40" rx="14" ry="14" fill="url(#gradGreenMain)"/>
+  <text class="legendText" x="514" y="1156">ML / Inference modules</text>
+  <rect class="legendSwatch" x="120" y="1182" width="76" height="40" rx="14" ry="14" fill="url(#gradOrangeMain)"/>
+  <text class="legendText" x="214" y="1208">Client modules</text>
+  <path class="arrow" d="M680 1148h140"/>
+  <text class="legendText" x="840" y="1153">Straight: forward data / prediction path</text>
+  <path class="arrow" d="M680 1204c55-28 100-28 140 0"/>
+  <text class="legendText" x="840" y="1208">Curved: supporting paths (storage, registry, compute)</text>
+</svg>

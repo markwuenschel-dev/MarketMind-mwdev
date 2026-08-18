@@ -1,0 +1,81 @@
+/* MarketMind Chart CSS */
+
+.chart-root {
+  -fx-background-color: transparent;
+}
+
+.chart-card {
+  -fx-background-color: white;
+  -fx-background-radius: 14px;
+  -fx-padding: 18px 24px 12px 24px;
+  -fx-effect: dropshadow(gaussian, rgba(90, 140, 200, 0.10), 12, 0, 0, 4);
+  -fx-border-radius: 14px;
+  -fx-border-color: #e0e8f0;
+}
+
+.chart-title {
+  -fx-font-size: 1.2em;
+  -fx-font-weight: bold;
+  -fx-text-fill: #2b3d53;
+  -fx-padding: 0 0 10px 0;
+}
+
+.chart-legend {
+  -fx-font-size: 0.95em;
+  -fx-text-fill: #6c7892;
+  -fx-padding: 0 0 4px 0;
+}
+
+.chart-axis {
+  -fx-tick-label-fill: #465474;
+  -fx-tick-label-font-size: 0.95em;
+  -fx-stroke: #d3dae3;
+}
+
+.chart-line {
+  -fx-stroke: #4078c0;
+  -fx-stroke-width: 2px;
+  -fx-effect: dropshadow(gaussian, rgba(64, 120, 192, 0.13), 8, 0, 0, 2);
+}
+
+.chart-area-fill {
+  -fx-fill: linear-gradient(to bottom, #e3f1fc 70%, transparent 100%);
+  -fx-opacity: 0.75;
+}
+
+.chart-bar {
+  -fx-bar-fill: #0fa05a;
+  -fx-background-radius: 7px;
+}
+
+.chart-bar-negative {
+  -fx-bar-fill: #d04242;
+}
+
+.chart-point {
+  -fx-background-color: #4078c0, white;
+  -fx-background-insets: 0, 2;
+  -fx-background-radius: 7px;
+  -fx-padding: 2px;
+}
+
+/* Tooltip styling for charts */
+.chart-tooltip {
+  -fx-background-color: #2b3d53ee;
+  -fx-text-fill: #fff;
+  -fx-background-radius: 8px;
+  -fx-font-size: 0.98em;
+  -fx-padding: 5px 10px;
+  -fx-effect: dropshadow(gaussian, rgba(64, 120, 192, 0.18), 8, 0, 0, 3);
+}
+
+/* Highlight active data point or series */
+.chart-series-active .chart-line {
+  -fx-stroke-width: 3.2px;
+  -fx-stroke: #1d2e46;
+}
+
+.chart-series-active .chart-point {
+  -fx-background-color: #ffcf40, #fff;
+  -fx-background-insets: 0, 1;
+}

@@ -1,0 +1,194 @@
+# ==============================================
+# General Settings
+# ==============================================
+
+# Set default line endings and normalization
+* text=auto eol=lf
+
+# ==============================================
+# Source code files
+# ==============================================
+
+# Python files
+*.py text diff=python
+
+# C++ files
+*.cpp text diff=cpp
+*.hpp text diff=cpp
+*.c text diff=c
+*.h text diff=c
+*.cc text diff=cpp
+*.hh text diff=cpp
+*.cxx text diff=cpp
+*.hxx text diff=cpp
+*.inl text diff=cpp
+
+# Java files
+*.java text diff=java
+
+# Maven
+/mvnw text eol=lf
+
+# Shell scripts
+*.sh text eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# YAML files
+*.yaml text
+*.yml text
+
+# JSON files
+*.json text diff=json
+
+# Markdown files
+*.md text diff=markdown
+
+# Jupyter Notebooks
+*.ipynb text
+
+# TOML / config
+*.toml text diff=toml
+
+# CMake
+*.cmake text diff=cmake
+CMakeLists.txt text diff=cmake
+
+# Docker
+Dockerfile text
+*.dockerfile text
+
+# ==============================================
+# Structured file diffs
+# ==============================================
+
+# Pretty JSON diffs
+*.json diff=json
+
+# ==============================================
+# Generated code (collapsed in GitHub PRs)
+# ==============================================
+
+*_pb2.py linguist-generated=true
+*_pb2_grpc.py linguist-generated=true
+*_generated.py linguist-generated=true
+*_autogen.py linguist-generated=true
+
+# ==============================================
+# Experiment artifacts (collapse in PRs)
+# ==============================================
+
+*manifest*.json linguist-generated=true
+*metrics*.json linguist-generated=true
+*report*.json linguist-generated=true
+*results*.json linguist-generated=true
+
+# ==============================================
+# Dataset safety
+# ==============================================
+
+*.feather filter=lfs diff=lfs merge=lfs -text
+*.onnx filter=lfs diff=lfs merge=lfs -text
+*.pt filter=lfs diff=lfs merge=lfs -text
+*.pth filter=lfs diff=lfs merge=lfs -text
+
+# ==============================================
+# Binary files
+# ==============================================
+
+# Images
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.bmp binary
+*.ico binary
+*.svg text
+
+# Archives
+*.zip binary
+*.tar binary
+*.gz binary
+*.rar binary
+*.7z binary
+
+# Compiled binaries and libraries
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
+*.lib binary
+*.class binary
+*.jar binary
+*.war binary
+*.ear binary
+*.obj binary
+*.o binary
+
+# Machine learning models (e.g., ONNX)
+*.onnx binary
+*.h5 binary
+*.bin binary
+*.pt binary
+*.pth binary
+*.ckpt binary
+*.joblib binary
+*.pkl binary
+
+
+
+# Databases and logs
+*.sqlite binary
+*.db binary
+*.parquet binary
+*.log text
+
+# Fonts
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+
+# ==============================================
+# Additional useful formats
+# ==============================================
+
+# Config
+*.toml text diff=toml
+
+# Dataset columnar formats
+*.feather binary
+*.arrow binary
+*.orc binary
+
+# CSV datasets
+*.csv text diff=csv
+
+# ==============================================
+# Specific Project Overrides
+# ==============================================
+
+# Force Unix line endings for scripts
+*.sh eol=lf
+
+# Force Windows line endings for batch scripts
+*.bat eol=crlf
+*.cmd eol=crlf
+
+# Ignore differences in generated files
+*_pb2.py linguist-generated=true
+*_pb2_grpc.py linguist-generated=true
+*.proto text
+
+# ==============================================
+# Large files handling (Git LFS)
+# ==============================================
+
+# Uncomment and use Git LFS if handling large files (optional)
+# *.bin filter=lfs diff=lfs merge=lfs -text
+# *.onnx filter=lfs diff=lfs merge=lfs -text
+# *.zip filter=lfs diff=lfs merge=lfs -text
+
+*.ipynb	diff=jupyternotebook
+
+*.ipynb	merge=jupyternotebook
